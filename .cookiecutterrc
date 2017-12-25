@@ -1,0 +1,64 @@
+# This file exists so you can easily regenerate your project.
+#
+# `cookiepatcher` is a convenient shim around `cookiecutter`
+# for regenerating projects (it will generate a .cookiecutterrc
+# automatically for any template). To use it:
+#
+#    pip install cookiepatcher
+#    cookiepatcher gh:ionelmc/cookiecutter-pylibrary project-path
+#
+# See:
+#    https://pypi.python.org/pypi/cookiepatcher
+#
+# Alternatively, you can run:
+#
+#    cookiecutter --overwrite-if-exists --config-file=project-path/.cookiecutterrc gh:ionelmc/cookiecutter-pylibrary
+
+default_context:
+
+    _copy_without_render:      [u'.templates/template*']
+    _template:                 'cookiecutter-numengo'
+    appveyor:                  'no'
+    c_extension_function:      'longest'
+    c_extension_module:        '_ngofile'
+    c_extension_optional:      'no'
+    c_extension_support:       'no'
+    cms_envs:                  '3.4.5'
+    codacy:                    'no'
+    codeclimate:               'no'
+    codecov:                   'no'
+    command_line_interface:    'click'
+    command_line_interface_bin_name: 'ngofile'
+    coveralls:                 'yes'
+    dev_status:                'Alpha'
+    distribution_name:         'ngofile'
+    django_envs:               '1.10, 1.11, 2.0'
+    email:                     'roman@numengo.com'
+    full_name:                 'C\xe9dric ROMAN'
+    github_username:           'numengo'
+    install_deps:              ''
+    keywords:                  'utilities'
+    landscape:                 'no'
+    license:                   'GNU General Public License v3'
+    linter:                    'flake8'
+    package_name:              'ngofile'
+    project_name:              'NgoFile'
+    project_short_description: 'misc file utilities'
+    python_envs:               'py27, py34, py35, pypy'
+    release_date:              'today'
+    repo_name:                 'python-ngofile'
+    requiresio:                'no'
+    scrutinizer:               'no'
+    setup_deps:                ''
+    sphinx_doctest:            'yes'
+    sphinx_theme:              'sphinx-rtd-theme'
+    test_deps:                 ''
+    test_matrix_configurator:  'yes'
+    test_matrix_separate_coverage: 'no'
+    test_runner:               'pytest'
+    travis:                    'yes'
+    type:                      'python'
+    version:                   '0.1.0'
+    visual_project:            'yes'
+    website:                   'http://www.numengo.com'
+    year:                      'now'

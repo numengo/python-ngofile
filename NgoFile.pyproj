@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0" DefaultTargets="Build">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{bb432da1-e910-11e7-91c9-a0afbdc34d2f}</ProjectGuid>
+    <ProjectHome />
+    <StartupFile>setup.py</StartupFile>
+    <SearchPath />
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <InterpreterId>MSBuild|Tox pypy|$(MSBuildProjectFullPath)</InterpreterId>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <PropertyGroup>
+    <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="D:\code\python-ngofile\AUTHORS.rst" />
+    <Content Include="D:\code\python-ngofile\CHANGELOG.rst" />
+    <Content Include="D:\code\python-ngofile\CONTRIBUTING.rst" />
+    <Content Include="D:\code\python-ngofile\docs\authors.rst" />
+    <Content Include="D:\code\python-ngofile\docs\changelog.rst" />
+    <Content Include="D:\code\python-ngofile\docs\contributing.rst" />
+    <Content Include="D:\code\python-ngofile\docs\index.rst" />
+    <Content Include="D:\code\python-ngofile\docs\installation.rst" />
+    <Content Include="D:\code\python-ngofile\docs\readme.rst" />
+    <Content Include="D:\code\python-ngofile\docs\reference\index.rst" />
+    <Content Include="D:\code\python-ngofile\docs\reference\ngofile.rst" />
+    <Content Include="D:\code\python-ngofile\docs\requirements.txt" />
+    <Content Include="D:\code\python-ngofile\docs\spelling_wordlist.txt" />
+    <Content Include="D:\code\python-ngofile\docs\usage.rst" />
+    <Content Include="D:\code\python-ngofile\README.rst" />
+    <Content Include="D:\code\python-ngofile\setup.cfg" />
+    <Content Include="D:\code\python-ngofile\tests\a\_.txt" />
+    <Content Include="D:\code\python-ngofile\tox.ini" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="D:\code\python-ngofile\bootstrap.py" />
+    <Compile Include="D:\code\python-ngofile\docs\conf.py" />
+    <Compile Include="D:\code\python-ngofile\pyproj_bootstrap.py" />
+    <Compile Include="D:\code\python-ngofile\setup.py" />
+    <Compile Include="D:\code\python-ngofile\src\ngofile\cli.py" />
+    <Compile Include="D:\code\python-ngofile\src\ngofile\ngocopy.py" />
+    <Compile Include="D:\code\python-ngofile\src\ngofile\ngofilelist.py" />
+    <Compile Include="D:\code\python-ngofile\src\ngofile\ngopathlist.py" />
+    <Compile Include="D:\code\python-ngofile\src\ngofile\__init__.py" />
+    <Compile Include="D:\code\python-ngofile\src\ngofile\__main__.py" />
+    <Compile Include="D:\code\python-ngofile\tests\a\_.py" />
+    <Compile Include="D:\code\python-ngofile\tests\test_ngofilelist.py" />
+    <Compile Include="D:\code\python-ngofile\tests\test_ngofile_cli.py" />
+    <Compile Include="D:\code\python-ngofile\tests\test_ngopathlist.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="D:\code\python-ngofile\src\ngofile" />
+    <Folder Include="D:\code\python-ngofile\tests" />
+    <Folder Include="D:\code\python-ngofile" />
+    <Folder Include="D:\code\python-ngofile\docs\reference" />
+    <Folder Include="D:\code\python-ngofile\tests\a" />
+    <Folder Include="D:\code\python-ngofile\docs" />
+    <Folder Include="docs\" />
+    <Folder Include="docs\reference\" />
+    <Folder Include="src\" />
+    <Folder Include="src\ngofile\" />
+    <Folder Include="tests\" />
+    <Folder Include="tests\a\" />
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
+  <ItemGroup>
+    <Interpreter Include=".tox\2.7">
+      <Id>Tox 2.7</Id>
+      <Description>2.7 python2.7 (x86)</Description>
+      <InterpreterPath>Scripts\python.exe</InterpreterPath>
+      <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
+      <Version>2.7</Version>
+      <Architecture>x86</Architecture>
+      <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
+    </Interpreter>
+    <Interpreter Include=".tox\3.4">
+      <Id>Tox 3.4</Id>
+      <Description>3.4 python3.4 (x86)</Description>
+      <InterpreterPath>Scripts\python.exe</InterpreterPath>
+      <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
+      <Version>3.4</Version>
+      <Architecture>x86</Architecture>
+      <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
+    </Interpreter>
+    <Interpreter Include=".tox\3.5">
+      <Id>Tox 3.5</Id>
+      <Description>3.5 python3.5 (x86)</Description>
+      <InterpreterPath>Scripts\python.exe</InterpreterPath>
+      <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
+      <Version>3.5</Version>
+      <Architecture>x86</Architecture>
+      <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
+    </Interpreter>
+    <Interpreter Include=".tox\pypy">
+      <Id>Tox pypy</Id>
+      <Description>pypy pypy (x86)</Description>
+      <InterpreterPath>bin\python.exe</InterpreterPath>
+      <WindowsInterpreterPath>bin\python.exe</WindowsInterpreterPath>
+      <Version>2.7</Version>
+      <Architecture>x86</Architecture>
+      <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
+    </Interpreter>
+  </ItemGroup>
+</Project>
