@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{3fc3105e-eb0d-11e7-b325-a0afbdc34d2f}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>run-tests.py</StartupFile>
+    <StartupFile>tests\test_ngopathlist.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -134,6 +134,30 @@
     <Folder Include=".\tests\a\bb\ccc" />
     <Folder Include=".\dist\docs\_static\css" />
     <Folder Include=".\tests\a" />
+    <Folder Include="dist\" />
+    <Folder Include="dist\docs\" />
+    <Folder Include="dist\docs\reference\" />
+    <Folder Include="dist\docs\_sources\" />
+    <Folder Include="dist\docs\_sources\reference\" />
+    <Folder Include="dist\docs\_static\" />
+    <Folder Include="dist\docs\_static\css\" />
+    <Folder Include="dist\docs\_static\js\" />
+    <Folder Include="docs\" />
+    <Folder Include="docs\reference\" />
+    <Folder Include="src\" />
+    <Folder Include="src\ngofile.egg-info\" />
+    <Folder Include="src\ngofile\" />
+    <Folder Include="src\ngofile\S3\" />
+    <Folder Include="tests\" />
+    <Folder Include="tests\a\" />
+    <Folder Include="tests\a\aa\" />
+    <Folder Include="tests\a\aa\aaa\" />
+    <Folder Include="tests\a\aa\bbb\" />
+    <Folder Include="tests\a\aa\ccc\" />
+    <Folder Include="tests\a\bb\" />
+    <Folder Include="tests\a\bb\aaa\" />
+    <Folder Include="tests\a\bb\bbb\" />
+    <Folder Include="tests\a\bb\ccc\" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>

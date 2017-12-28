@@ -9,20 +9,16 @@ from __future__ import unicode_literals
 from builtins import str
 from builtins import object
 import logging
-import os
-import os.path
-import sys
 import zipfile
 from pathlib import Path
-
 import pytest
-
 import ngofile
 
 test_file = Path(__file__).resolve()
 test_dir = Path(__file__).resolve().parent
 test_dir_a = test_dir.joinpath('a')
 
+logger = logging.getLogger(__name__)
 
 class TestNgoFileList(object):
     def test_list_files_with_patterns(self):
@@ -43,11 +39,8 @@ class TestNgoFileList(object):
             test_dir_a, "*.data", ["bb", "bbb"], recursive=True)
         assert len(fs) == 4
 
-        try:
+        with pytest.raises(ngofile.NotADirectoryException):
             fs = ngofile.list_files(test_file)
-            assert False, "should have thrown an exception"
-        except:
-            pass
 
     def test_list_files_in_zip(self):
         f = test_dir.joinpath('tmp_dir_py.zip')

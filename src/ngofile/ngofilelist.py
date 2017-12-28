@@ -11,21 +11,25 @@ from __future__ import unicode_literals
 
 from builtins import str
 import fnmatch
-import os
-import os.path
 import re
 import zipfile
-from builtins import object
 from builtins import range
 from pathlib import Path
 
+from .exceptions import NotExistingPathException, NotADirectoryException, NotAZipArchiveException
+
 try:
-    UNICODE_EXISTS = bool(type(str))
-except NameError:
-    str = lambda s: str(s)
+    unicode = str
+except Exception:
+    pass
 
 
-def __assert_path(path):
+def _assert_is_directory(path):
+    """ asserts a path exists and is a directory or throw exception
+
+    :param path: path to assert
+    :type path: string or pathlib.Path
+    :rtype: pathlib.Path """
     if not isinstance(path, Path):
         path = Path(str(path))
     if not path.exists():
@@ -38,10 +42,15 @@ def __assert_path(path):
 def list_files(srcdir, includes=["*"], excludes=[], recursive=False):
     """ list files in a source directory with a list of given patterns 
     
-    :srcdir: source directory
-    :includes: pattern or list of patterns ('*.py', '*.txt', etc...)
-    :excludes: patterns to exclude
-    :recursive: boolean to list files recursively
+    :param srcdir: source directory
+    :type srcdir: string or pathlib.Path
+    :param includes: pattern or list of patterns ('*.py', '*.txt', etc...)
+    :type includes: string or list of strings
+    :param excludes: patterns to exclude
+    :type excludes: string or list of strings
+    :param recursive:list files recursively
+    :type recursive: boolean
+    :rtype: list of pathlib.Path
     """
 
     # first we define a helper function for recursive operations
@@ -64,7 +73,7 @@ def list_files(srcdir, includes=["*"], excludes=[], recursive=False):
                 ret.append(path)
         return ret
 
-    srcdir = __assert_path(srcdir)
+    srcdir = _assert_is_directory(srcdir)
     if not isinstance(includes, list):
         includes = [includes]
     return list_files_in_dir(srcdir, includes, excludes, recursive)
@@ -84,20 +93,25 @@ def list_files(srcdir, includes=["*"], excludes=[], recursive=False):
 #            for f in files]
 
 
-def list_files_in_zip(archive, includes, excludes=[], recursive=False):
+def list_files_in_zip(archive, includes=["*"], excludes=[], recursive=False):
     """ list files in a zip file
 
-    archive: zipfile object
-    pattern: pattern or list of patterns ('*.py', '**/*.py', etc...)
-    excludes: list of patterns to exclude
-    recursive: boolean
+    :param archive: zipfile to explore
+    :type archive: zipfile.ZipFile
+    :param includes: pattern or list of patterns ('*.py', '*.txt', etc...)
+    :type includes: string or list of strings
+    :param excludes: patterns to exclude
+    :type excludes: string or list of strings
+    :param recursive:list files recursively
+    :type recursive: boolean
+    :rtype: list of strings
     """
     if not isinstance(includes, list):
         includes = [includes]
     includes = [i.replace('\\', '/') for i in includes]
-    #if not zipfile.is_zipfile(archive):
-    #    raise Exception('%s is not a valid zip file'%srczipfile)
-    #a = zipfile.ZipFile(srczipfile,'r')
+    if not isinstance(archive, zipfile.ZipFile):
+        raise NotAZipArchiveException(
+            '%r is not a valid zip file' % archive)
     dirs = set()
     for d in [
             re.match('(.*)/[^/]*$', l).group(1) for l in archive.namelist()

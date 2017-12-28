@@ -55,7 +55,7 @@ def get_package_data(package):
     package themselves.
     """
     walk = [(dirpath.replace(package + os.sep, '', 1), filenames)
-            for dirpath, dirnames, filenames in os.walk(os.path.join('src',package))
+            for dirpath, dirnames, filenames in os.walk(os.path.join('src', package))
             if not os.path.exists(os.path.join(dirpath, '__init__.py'))]
 
     filepaths = []
@@ -94,8 +94,7 @@ setup(
     license=license,
     description=description,
     long_description='%s\n%s' %
-    (re.compile('^.. start-badges.*^.. end-badges', re.M
-                | re.S).sub('', read('README.rst')),
+    (re.compile('^.. start-badges.*^.. end-badges', re.M | re.S).sub('', read('README.rst')),
      re.sub(':[a-z]+:`~?(.*?)`', r'``\1``', read('CHANGELOG.rst'))),
     author=author,
     author_email=author_email,
@@ -103,7 +102,7 @@ setup(
     packages=find_packages('src'),
     package_dir={'': 'src'},
     package_data=get_package_data(package),
-    py_modules=[splitext(basename(path))[0] for path in glob('src/*.py')],
+    py_modules=[os.path.splitext(os.path.basename(p))[0] for p in glob('src/*.py')],
     include_package_data=True,
     zip_safe=False,
     keywords=["utilities"],

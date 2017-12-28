@@ -9,18 +9,14 @@ from __future__ import unicode_literals
 from builtins import str
 from builtins import object
 import logging
-import os
-import os.path
-import sys
 from pathlib import Path
-
-import pytest
 
 import ngofile
 
 test_file = Path(__file__).resolve()
 test_dir = Path(__file__).resolve().parent
 
+logger = logging.getLogger(__name__)
 
 class TestNgoPathList(object):
     def test_singleton(self):
@@ -35,3 +31,7 @@ class TestNgoPathList(object):
         p2 = a.pick_first(test_file.name)
         assert p2.exists()
         assert not a.exists('dummy.dum')
+
+if __name__ == '__main__':
+    TestNgoPathList.test_singleton()
+    TestNgoPathList.test_exists()

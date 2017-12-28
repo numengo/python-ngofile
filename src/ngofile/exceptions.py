@@ -24,3 +24,9 @@ class NotADirectoryException(NgoFileException, ValueError):
     """
     Raised when a path is not a directory
     """
+
+
+class NotAZipArchiveException(NgoFileException, ValueError):
+    """
+    Raised when the object given is not a zipfile
+    """

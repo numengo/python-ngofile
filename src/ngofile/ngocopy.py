@@ -18,9 +18,13 @@ enc = sys.stdout.encoding or "cp850"
 
 
 def ngocopy(src, dst):
-    """ copy a file src to dst (directory). 
+    """ copy a file src to dst (directory).
     
-    if dst exists and is the same, nothing is done"""
+    if dst exists and is the same, nothing is done
+
+    :param src: source file or directory
+    :param dst: destination file or directory
+    """
     logger = logging.getLogger(__name__)
     if os.path.exists(dst) and os.path.isdir(dst):
         dst = os.path.join(dst, os.path.basename(src))
@@ -30,7 +34,7 @@ def ngocopy(src, dst):
             shutil.copy2(src, dst)
         else:
             pass
-            #logger.info(unicode(dst,enc) + ' already up to date')
+            # logger.info(unicode(dst,enc) + ' already up to date')
     else:
         logger.debug('copy ' + str(src, enc) + ' to ' + str(dst, enc))
         shutil.copy2(src, dst)
