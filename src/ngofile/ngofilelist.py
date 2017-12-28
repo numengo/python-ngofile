@@ -6,91 +6,85 @@ utilities to list files in a directory, or a zip file
 
 author: Cedric ROMAN (roman@numengo.com)
 licence: GNU GPLv3
-
 """
 from __future__ import unicode_literals
-from builtins import range
-from builtins import object
 
+from builtins import str
+import fnmatch
 import os
 import os.path
+import re
+import zipfile
+from builtins import object
+from builtins import range
 from pathlib import Path
 
-def list_files_with_patterns(srcdir,pattern='*',excludes=[],recursive=True):
+try:
+    UNICODE_EXISTS = bool(type(str))
+except NameError:
+    str = lambda s: str(s)
+
+
+def __assert_path(path):
+    if not isinstance(path, Path):
+        path = Path(str(path))
+    if not path.exists():
+        raise NotExistingPathException("%s does not exist." % path)
+    if not path.is_dir():
+        raise NotADirectoryException("%s is not a directory" % path)
+    return path
+
+
+def list_files(srcdir, includes=["*"], excludes=[], recursive=False):
     """ list files in a source directory with a list of given patterns 
     
-    srcdir: source directory
-    pattern: pattern or list of patterns ('*.py', '*.txt', etc...)
-    excludes: patterns to exclude
-    recursive: boolean to explore recursively
+    :srcdir: source directory
+    :includes: pattern or list of patterns ('*.py', '*.txt', etc...)
+    :excludes: patterns to exclude
+    :recursive: boolean to list files recursively
     """
-    if not isinstance(srcdir,Path):
-        srcdir = Path(srcdir)
-    if not srcdir.is_dir():
-        raise Exception('%s is not a directory'%srcdir)
-        
-    if isinstance(pattern,list):
-        ret = []
-        for _ in pattern:
-            ret += list_files_with_patterns(srcdir,_,excludes,recursive)
-        return ret
-    if recursive and not pattern.startswith('**/'):
-        pattern = '**/' + pattern
-    ms = sorted(srcdir.glob(pattern))
-    for pt in excludes:
-        ms = [m for m in ms if not m.match(pt)]
-    return ms
-        
-def list_files(srcdir,excludes=[],recursive=False):
-    """ list files of a directory with a list of excludes pattern 
-    
-    srcdir: source directory
-    excludes: list of patterns to exclude
-    recursive: boolean to list files recursively
-    """
+
     # first we define a helper function for recursive operations
     def list_files_in_dir(srcdir, includes, excludes, recursive):
-        import re
-        import fnmatch
         ret = []
-        if not srcdir.is_dir(): raise Exception('%s is not a directory'%srcdir)
+        if not srcdir.is_dir():
+            raise NotADirectoryException('%s is not a directory' % srcdir)
         incl = r'|'.join([fnmatch.translate(x) for x in includes])
         excl = r'|'.join([fnmatch.translate(x) for x in excludes]) or r'$.'
-        allnames = [_.name for _ in srcdir.glob('*')]
-        names = [name for name in allnames if re.match(excl, name) is None]
-        for name in names:
-            srcname = srcdir.joinpath(name)
-            if srcname.is_dir():
-                if re.match(incl, name) and recursive:
-                    ret = ret + list_files_in_dir(srcname, includes, excludes,
-                                               recursive)
+        names_all = [_.name for _ in srcdir.glob('*')]
+        names_not_excl = [
+            name for name in names_all if re.match(excl, name) is None
+        ]
+        for name in names_not_excl:
+            path = srcdir.joinpath(name)
+            if path.is_dir() and recursive:
+                ret = ret + list_files_in_dir(path, includes, excludes,
+                                              recursive)
             elif re.match(incl, name):
-                ret.append(srcname)
+                ret.append(path)
         return ret
 
-    if not isinstance(srcdir,Path):
-        srcdir = Path(srcdir)
-    if not srcdir.is_dir():
-        raise Exception('%s is not a directory'%srcdir)
-        
-    # now real stuff
-    return list_files_in_dir(srcdir, ['*'], excludes,
-                               recursive)
+    srcdir = __assert_path(srcdir)
+    if not isinstance(includes, list):
+        includes = [includes]
+    return list_files_in_dir(srcdir, includes, excludes, recursive)
 
-def list_files_to_move(srcdir,dest,excludes=[],recursive=False):
-    """ list files to move from a directory to another.
-    
-    srcdir: source directory
-    dest: destination directory
-    excludes: list of patterns to exclude
-    recursive: boolean
-    """
-    files = list_files(srcdir,excludes,recursive)
-    d = Path(dest)
-    return [(f, d.joinpath(f.relative_to(srcdir)) )
-            for f in files]
-        
-def list_files_in_zip(archive, pattern, excludes=[], recursive=False):
+
+#def list_files_to_move(srcdir,dest,excludes=[],recursive=False):
+#    """ list files to move from a directory to another.
+#
+#    srcdir: source directory
+#    dest: destination directory
+#    excludes: list of patterns to exclude
+#    recursive: boolean
+#    """
+#    files = list_files(srcdir,excludes,recursive)
+#    d = Path(dest)
+#    return [(f, d.joinpath(f.relative_to(srcdir)) )
+#            for f in files]
+
+
+def list_files_in_zip(archive, includes, excludes=[], recursive=False):
     """ list files in a zip file
 
     archive: zipfile object
@@ -98,9 +92,10 @@ def list_files_in_zip(archive, pattern, excludes=[], recursive=False):
     excludes: list of patterns to exclude
     recursive: boolean
     """
-    pattern = pattern.replace('\\','/')
-    import re, fnmatch, zipfile
-    #if not zipfile.is_zipfile(srczipfile):
+    if not isinstance(includes, list):
+        includes = [includes]
+    includes = [i.replace('\\', '/') for i in includes]
+    #if not zipfile.is_zipfile(archive):
     #    raise Exception('%s is not a valid zip file'%srczipfile)
     #a = zipfile.ZipFile(srczipfile,'r')
     dirs = set()
@@ -111,8 +106,7 @@ def list_files_in_zip(archive, pattern, excludes=[], recursive=False):
         dirs.add(d)
         for i in range(len(d.split('/'))):
             dirs.add('/'.join(d.split('/')[0:i]))
-    incl = fnmatch.translate(pattern)
-    #print incl
+    incl = r'|'.join([fnmatch.translate(x) for x in includes])
     excl = r'|'.join([fnmatch.translate(x) for x in excludes]) or r'$.'
     if len([x for x in dirs if re.match(incl, x)]):
         incl = incl.replace(
@@ -126,7 +120,3 @@ def list_files_in_zip(archive, pattern, excludes=[], recursive=False):
         n for n in archive.namelist()
         if re.match(incl, n) and re.search(excl, n) is None
     ]
-
-def path_join(pathlist):
-    """ join a list of paths and clean it """
-    return os.path.sep.join(pathlist).replace('\\\\', '\\')

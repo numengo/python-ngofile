@@ -11,7 +11,7 @@ Overview
       - |docs|
     * - tests
       - | |travis|
-        | |coveralls|
+        | |codecov|
     * - package
       - | |version| |wheel| |supported-versions| |supported-implementations|
         | |commits-since|
@@ -24,9 +24,9 @@ Overview
     :alt: Travis-CI Build Status
     :target: https://travis-ci.org/numengo/python-ngofile
 
-.. |coveralls| image:: https://coveralls.io/repos/numengo/python-ngofile/badge.svg?branch=master&service=github
+.. |codecov| image:: https://codecov.io/github/numengo/python-ngofile/coverage.svg?branch=master
     :alt: Coverage Status
-    :target: https://coveralls.io/r/numengo/python-ngofile
+    :target: https://codecov.io/github/numengo/python-ngofile
 
 .. |version| image:: https://img.shields.io/pypi/v/ngofile.svg
     :alt: PyPI Package latest release

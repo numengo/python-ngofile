@@ -109,7 +109,7 @@ if __name__ == "__main__":
             elif any([fnmatch(f.name,p) for p in patterns]):
                 ret.append(fp)
         return ret
-        
+    
     inc_patterns = ['*.txt', '*.ini', '*.cfg', '*json', '*.html', '*.css', '*.js', '*.rst']
     excludes     = ['.*', 'envs', 'dist', 'build','__pycache__', '*.egg-info']
     srcs = list_files(base_path,"*.py",excludes)

@@ -3,15 +3,16 @@
 2017/11/12: C.ROMAN (in africa)
 functions/class to deal with filepathes
 """
-from builtins import str
-from builtins import object
+from __future__ import unicode_literals
+import logging
 import os
 import os.path
 import sys
-
-import logging
-
+from builtins import object
+from builtins import str
 from pathlib import Path
+
+import ngofile
 
 
 class NgoPathList(object):
@@ -25,8 +26,7 @@ class NgoPathList(object):
     def __new__(cls, *args, **kwargs):
         logger = logging.getLogger(__name__)
         if not cls._instance:
-            cls._instance = super(NgoPathList, cls).__new__(
-                cls)
+            cls._instance = super(NgoPathList, cls).__new__(cls)
         if 'pathlist' in list(kwargs.keys()):
             cls._instance.set_pathlist(pathlist)
         for arg in args:
@@ -36,6 +36,7 @@ class NgoPathList(object):
     @property
     def pathlist(self):
         return self._pathlist
+
     @pathlist.setter
     def set_pathlist(self, pathlist):
         for p in pathlist:
@@ -56,19 +57,19 @@ class NgoPathList(object):
             if str(p.resolve()) not in self.as_strings():
                 self._pathlist.append(p.resolve())
             else:
-                logger.warning('%s already in pathlist'%p)
+                logger.warning('%s already in pathlist' % p)
         else:
             logger.warning(
-                '%s not added to pathlist because it does not exist'%p)
+                '%s not added to pathlist because it does not exist' % p)
 
     def exists(self, path):
         """ check if a path exists in pathlist """
-        return len(self.all_matches(path))>0
+        return len(self.all_matches(path)) > 0
 
     def pick_first(self, path):
         """ picks the first existing match"""
         ms = self.all_matches(path)
-        if len(ms)>0:
+        if len(ms) > 0:
             return ms[0]
 
     def all_matches(self, path):

@@ -4,19 +4,18 @@ from __future__ import absolute_import
 from __future__ import print_function
 
 import io
+import os.path
 import re
 import sys
-import os.path
 from glob import glob
 
 from setuptools import find_packages
 from setuptools import setup
 
-
 name = 'ngofile'
 package = 'ngofile'
 description = 'misc file utilities'
-url='https://github.com/numengo/python-ngofile'
+url = 'https://github.com/numengo/python-ngofile'
 author = 'C\xe9dric ROMAN'
 author_email = 'roman@numengo.com'
 license = 'GNU General Public License v3'
@@ -25,17 +24,17 @@ license = 'GNU General Public License v3'
 def read(*names, **kwargs):
     return io.open(
         os.path.join(os.path.dirname(__file__), *names),
-        encoding=kwargs.get('encoding', 'utf8')
-    ).read()
+        encoding=kwargs.get('encoding', 'utf8')).read()
 
 
 def get_version(package):
     """
     Return package version as listed in `__version__` in `init.py`.
     """
-    init_py = open(os.path.join('src',package, '__init__.py')).read()
-    return re.search("^__version__ = ['\"]([^'\"]+)['\"]",
-                     init_py, re.MULTILINE).group(1)
+    init_py = open(os.path.join('src', package, '__init__.py')).read()
+    return re.search("^__version__ = ['\"]([^'\"]+)['\"]", init_py,
+                     re.MULTILINE).group(1)
+
 
 version = get_version(package)
 
@@ -44,9 +43,10 @@ def get_packages(package):
     """
     Return root package and all sub-packages.
     """
-    return [dirpath
-            for dirpath, dirnames, filenames in os.walk(package)
-            if os.path.exists(os.path.join(dirpath, '__init__.py'))]
+    return [
+        dirpath for dirpath, dirnames, filenames in os.walk(package)
+        if os.path.exists(os.path.join(dirpath, '__init__.py'))
+    ]
 
 
 def get_package_data(package):
@@ -55,64 +55,66 @@ def get_package_data(package):
     package themselves.
     """
     walk = [(dirpath.replace(package + os.sep, '', 1), filenames)
-            for dirpath, dirnames, filenames in os.walk(package)
+            for dirpath, dirnames, filenames in os.walk(os.path.join('src',package))
             if not os.path.exists(os.path.join(dirpath, '__init__.py'))]
 
     filepaths = []
     for base, filenames in walk:
-        filepaths.extend([os.path.join(base, filename)
-                          for filename in filenames])
+        filepaths.extend(
+            [os.path.join(base, filename) for filename in filenames])
     return {package: filepaths}
-    
-setup_requires=[
+
+
+setup_requires = [
     'pathlib',
     'lxml',
     'matrix',
-    'pytest-runner', 
+    'pytest-runner',
 ]
 
-install_requires=[
-    'future',
+install_requires = [
     'pathlib',
-    'click', 
+    'click',
 ]
 
-test_requires=[
-    'pytest', 
+test_requires = [
+    'pytest',
+    'pytest-logger',
 ]
 
-extras_requires=[
-]
-   
+extras_requires = {
+    # eg:
+    #   'rst': ['docutils>=0.11'],
+    #   ':python_version=="2.6"': ['argparse'],
+}
+
 setup(
     name=name,
     version=version,
     license=license,
     description=description,
-    long_description='%s\n%s' % (
-        re.compile('^.. start-badges.*^.. end-badges', re.M | re.S).sub('', read('README.rst')),
-        re.sub(':[a-z]+:`~?(.*?)`', r'``\1``', read('CHANGELOG.rst'))
-    ),
+    long_description='%s\n%s' %
+    (re.compile('^.. start-badges.*^.. end-badges', re.M
+                | re.S).sub('', read('README.rst')),
+     re.sub(':[a-z]+:`~?(.*?)`', r'``\1``', read('CHANGELOG.rst'))),
     author=author,
     author_email=author_email,
     url=url,
     packages=find_packages('src'),
-    package_data=get_package_data(package),
     package_dir={'': 'src'},
+    package_data=get_package_data(package),
     py_modules=[splitext(basename(path))[0] for path in glob('src/*.py')],
     include_package_data=True,
-    zip_safe=False,    
-    keywords= ["utilities"], 
+    zip_safe=False,
+    keywords=["utilities"],
     python_requires=">=2.7,!=3.6.*,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,",
     setup_requires=setup_requires,
     install_requires=install_requires,
     tests_require=test_requires,
-    extras_requires=extras_requires,
-    entry_points={
-        'console_scripts': [
-            'ngofile = ngofile.cli:main',
-        ]
-    },
+    extras_require=extras_requires,
+    entry_points={'console_scripts': [
+        'ngofile = ngofile.cli:main',
+    ]},
     classifiers=[
         # complete classifier list: http://pypi.python.org/pypi?%3Aaction=list_classifiers
         'Development Status :: 3 - Alpha',
@@ -121,9 +123,9 @@ setup(
         'Operating System :: Unix',
         'Operating System :: POSIX',
         'Operating System :: Microsoft :: Windows',
-        'Programming Language :: Python',    
-        'Programming Language :: Python :: 2.7',    
-        'Programming Language :: Python :: 3.4',    
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: Implementation :: PyPy',
         'Programming Language :: Python :: Implementation :: CPython',

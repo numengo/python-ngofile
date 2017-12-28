@@ -1,18 +1,19 @@
 # coding: utf-8
 """ misc copy utilities
 """
+from __future__ import unicode_literals
 
-from builtins import str
-from builtins import range
+import filecmp
 import fnmatch
+import logging
 import os
 import os.path
 import re
-import filecmp
 import shutil
-import logging
-
 import sys
+from builtins import range
+from builtins import str
+
 enc = sys.stdout.encoding or "cp850"
 
 

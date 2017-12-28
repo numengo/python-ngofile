@@ -5,60 +5,55 @@ setup.py - created on 2017/11/15 08:44:32
 author: Cedric ROMAN
 email: roman@numengo.com
 licence: GNU GPLv3 """
+from __future__ import unicode_literals
+from builtins import str
+from builtins import object
+import logging
 import os
 import os.path
 import sys
+import zipfile
+from pathlib import Path
 
 import pytest
 
-import logging
-logging.basicConfig(level=logging.DEBUG)
-from ngoutils import *
+import ngofile
 
-from pathlib import Path
 test_file = Path(__file__).resolve()
 test_dir = Path(__file__).resolve().parent
+test_dir_a = test_dir.joinpath('a')
 
-from ngofile import *
 
-class TestNgoFileList(TestCase):
-
+class TestNgoFileList(object):
     def test_list_files_with_patterns(self):
-        fs = list_files_with_patterns(test_dir)
-        assert len(fs)>=1
-        fs = list_files_with_patterns(test_dir,'test_*.py')
-        assert len(fs)>=1
-        fs = list_files_with_patterns(test_dir,['test_*.py'])
-        assert len(fs)>=1
+        # works with Path object
+        fs1 = ngofile.list_files(test_dir_a, recursive=True)
+        # works with path as a string
+        fs2 = ngofile.list_files(str(test_dir_a), recursive=True)
+        assert len(fs1) == len(fs2)
+        # only selects *.py files
+        fs = ngofile.list_files(test_dir_a, "*.data", recursive=True)
+        assert len(fs) == 9
+        # only selects *.py and *.txt files
+        fs = ngofile.list_files(
+            test_dir_a, ["*.data", "*.txt"], recursive=True)
+        assert len(fs) == 18
+        # only selects *.py files, but excludes b and bb directories
+        fs = ngofile.list_files(
+            test_dir_a, "*.data", ["bb", "bbb"], recursive=True)
+        assert len(fs) == 4
 
-    def test_list_files(self):
-        fs = list_files(test_dir)
-        assert len(fs)>=1
         try:
-            fs = list_files(test_file)
-            assert False,"should have thrown an exception"
+            fs = ngofile.list_files(test_file)
+            assert False, "should have thrown an exception"
         except:
             pass
-        fs2 = list_files(test_dir,["*.py"])
-        assert len(fs)-len(fs2)>0
-        fs3 = list_files_with_patterns(test_dir,'*.py',recursive=False)
-        assert len(fs)-len(fs2)==len(fs3)
 
-    def test_list_files_to_move(self):
-        dest = Path('new_dir') # doesn't need to exist so far
-        fs = list_files_to_move(test_dir,dest,['*.pyc'])
-        for f in fs:
-            self.logger.info(f)
-
-    def list_files_in_zip(self):
+    def test_list_files_in_zip(self):
         f = test_dir.joinpath('tmp_dir_py.zip')
-        z = zipfile.ZipFile(str(f.resolve()),'r')
-        ls1 = list_files_in_zip(z, "**/*.py", excludes=[], recursive=False)
-        ls2 = list_files_in_zip(z, "*.py", excludes=[], recursive=True)
-        ls3 = list_files_in_zip(z, "*", excludes=["*.txt"], recursive=True)
-        assert len(ls1)==len(ls2)
-        assert len(ls2)==len(ls3)
+        z = zipfile.ZipFile(str(f), 'r')
+        ls1 = ngofile.list_files_in_zip(z, "*.py", excludes=[], recursive=True)
+        ls2 = ngofile.list_files_in_zip(
+            z, "*", excludes=["*.txt"], recursive=True)
+        assert len(ls2) >= len(ls1)  # because ls1 contains folders too
         z.close()
-
-if __name__ == '__main__':
-    pytest.main()

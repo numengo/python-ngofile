@@ -1,17 +1,17 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0" DefaultTargets="Build">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{bb432da1-e910-11e7-91c9-a0afbdc34d2f}</ProjectGuid>
+    <ProjectGuid>{3fc3105e-eb0d-11e7-b325-a0afbdc34d2f}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>setup.py</StartupFile>
+    <StartupFile>run-tests.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <InterpreterId>MSBuild|Tox pypy|$(MSBuildProjectFullPath)</InterpreterId>
+    <InterpreterId>MSBuild|NgoFile|$(MSBuildProjectFullPath)</InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
@@ -19,94 +19,123 @@
     <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="D:\code\python-ngofile\AUTHORS.rst" />
-    <Content Include="D:\code\python-ngofile\CHANGELOG.rst" />
-    <Content Include="D:\code\python-ngofile\CONTRIBUTING.rst" />
-    <Content Include="D:\code\python-ngofile\docs\authors.rst" />
-    <Content Include="D:\code\python-ngofile\docs\changelog.rst" />
-    <Content Include="D:\code\python-ngofile\docs\contributing.rst" />
-    <Content Include="D:\code\python-ngofile\docs\index.rst" />
-    <Content Include="D:\code\python-ngofile\docs\installation.rst" />
-    <Content Include="D:\code\python-ngofile\docs\readme.rst" />
-    <Content Include="D:\code\python-ngofile\docs\reference\index.rst" />
-    <Content Include="D:\code\python-ngofile\docs\reference\ngofile.rst" />
-    <Content Include="D:\code\python-ngofile\docs\requirements.txt" />
-    <Content Include="D:\code\python-ngofile\docs\spelling_wordlist.txt" />
-    <Content Include="D:\code\python-ngofile\docs\usage.rst" />
-    <Content Include="D:\code\python-ngofile\README.rst" />
-    <Content Include="D:\code\python-ngofile\setup.cfg" />
-    <Content Include="D:\code\python-ngofile\tests\a\_.txt" />
-    <Content Include="D:\code\python-ngofile\tox.ini" />
+    <Content Include=".\AUTHORS.rst" />
+    <Content Include=".\CHANGELOG.rst" />
+    <Content Include=".\CONTRIBUTING.rst" />
+    <Content Include=".\dist\docs\authors.html" />
+    <Content Include=".\dist\docs\changelog.html" />
+    <Content Include=".\dist\docs\contributing.html" />
+    <Content Include=".\dist\docs\genindex.html" />
+    <Content Include=".\dist\docs\index.html" />
+    <Content Include=".\dist\docs\installation.html" />
+    <Content Include=".\dist\docs\output.txt" />
+    <Content Include=".\dist\docs\py-modindex.html" />
+    <Content Include=".\dist\docs\readme.html" />
+    <Content Include=".\dist\docs\reference\index.html" />
+    <Content Include=".\dist\docs\reference\ngofile.html" />
+    <Content Include=".\dist\docs\search.html" />
+    <Content Include=".\dist\docs\searchindex.js" />
+    <Content Include=".\dist\docs\usage.html" />
+    <Content Include=".\dist\docs\_sources\authors.rst.txt" />
+    <Content Include=".\dist\docs\_sources\changelog.rst.txt" />
+    <Content Include=".\dist\docs\_sources\contributing.rst.txt" />
+    <Content Include=".\dist\docs\_sources\index.rst.txt" />
+    <Content Include=".\dist\docs\_sources\installation.rst.txt" />
+    <Content Include=".\dist\docs\_sources\readme.rst.txt" />
+    <Content Include=".\dist\docs\_sources\reference\index.rst.txt" />
+    <Content Include=".\dist\docs\_sources\reference\ngofile.rst.txt" />
+    <Content Include=".\dist\docs\_sources\usage.rst.txt" />
+    <Content Include=".\dist\docs\_static\basic.css" />
+    <Content Include=".\dist\docs\_static\css\badge_only.css" />
+    <Content Include=".\dist\docs\_static\css\theme.css" />
+    <Content Include=".\dist\docs\_static\doctools.js" />
+    <Content Include=".\dist\docs\_static\jquery-3.1.0.js" />
+    <Content Include=".\dist\docs\_static\jquery.js" />
+    <Content Include=".\dist\docs\_static\js\modernizr.min.js" />
+    <Content Include=".\dist\docs\_static\js\theme.js" />
+    <Content Include=".\dist\docs\_static\pygments.css" />
+    <Content Include=".\dist\docs\_static\searchtools.js" />
+    <Content Include=".\dist\docs\_static\underscore-1.3.1.js" />
+    <Content Include=".\dist\docs\_static\underscore.js" />
+    <Content Include=".\dist\docs\_static\websupport.js" />
+    <Content Include=".\docs\authors.rst" />
+    <Content Include=".\docs\changelog.rst" />
+    <Content Include=".\docs\contributing.rst" />
+    <Content Include=".\docs\index.rst" />
+    <Content Include=".\docs\installation.rst" />
+    <Content Include=".\docs\readme.rst" />
+    <Content Include=".\docs\reference\index.rst" />
+    <Content Include=".\docs\reference\ngofile.rst" />
+    <Content Include=".\docs\requirements.txt" />
+    <Content Include=".\docs\spelling_wordlist.txt" />
+    <Content Include=".\docs\usage.rst" />
+    <Content Include=".\README.rst" />
+    <Content Include=".\setup.cfg" />
+    <Content Include=".\src\ngofile.egg-info\dependency_links.txt" />
+    <Content Include=".\src\ngofile.egg-info\entry_points.txt" />
+    <Content Include=".\src\ngofile.egg-info\requires.txt" />
+    <Content Include=".\src\ngofile.egg-info\SOURCES.txt" />
+    <Content Include=".\src\ngofile.egg-info\top_level.txt" />
+    <Content Include=".\tests\a\aa\aaa\_.txt" />
+    <Content Include=".\tests\a\aa\bbb\_.txt" />
+    <Content Include=".\tests\a\aa\ccc\_.txt" />
+    <Content Include=".\tests\a\aa\_.txt" />
+    <Content Include=".\tests\a\bb\aaa\_.txt" />
+    <Content Include=".\tests\a\bb\bbb\_.txt" />
+    <Content Include=".\tests\a\bb\ccc\_.txt" />
+    <Content Include=".\tests\a\bb\_.txt" />
+    <Content Include=".\tests\a\_.txt" />
+    <Content Include=".\tox.ini" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="D:\code\python-ngofile\bootstrap.py" />
-    <Compile Include="D:\code\python-ngofile\docs\conf.py" />
-    <Compile Include="D:\code\python-ngofile\pyproj_bootstrap.py" />
-    <Compile Include="D:\code\python-ngofile\setup.py" />
-    <Compile Include="D:\code\python-ngofile\src\ngofile\cli.py" />
-    <Compile Include="D:\code\python-ngofile\src\ngofile\ngocopy.py" />
-    <Compile Include="D:\code\python-ngofile\src\ngofile\ngofilelist.py" />
-    <Compile Include="D:\code\python-ngofile\src\ngofile\ngopathlist.py" />
-    <Compile Include="D:\code\python-ngofile\src\ngofile\__init__.py" />
-    <Compile Include="D:\code\python-ngofile\src\ngofile\__main__.py" />
-    <Compile Include="D:\code\python-ngofile\tests\a\_.py" />
-    <Compile Include="D:\code\python-ngofile\tests\test_ngofilelist.py" />
-    <Compile Include="D:\code\python-ngofile\tests\test_ngofile_cli.py" />
-    <Compile Include="D:\code\python-ngofile\tests\test_ngopathlist.py" />
+    <Compile Include=".\bootstrap.py" />
+    <Compile Include=".\docs\conf.py" />
+    <Compile Include=".\pyproj_bootstrap.py" />
+    <Compile Include=".\run-coverage.py" />
+    <Compile Include=".\run-tests.py" />
+    <Compile Include=".\setup.py" />
+    <Compile Include=".\src\ngofile\cli.py" />
+    <Compile Include=".\src\ngofile\exceptions.py" />
+    <Compile Include=".\src\ngofile\ngocopy.py" />
+    <Compile Include=".\src\ngofile\ngofilelist.py" />
+    <Compile Include=".\src\ngofile\ngopathlist.py" />
+    <Compile Include=".\src\ngofile\S3\downloadS3.py" />
+    <Compile Include=".\src\ngofile\S3\progressbar.py" />
+    <Compile Include=".\src\ngofile\S3\uploadS3.py" />
+    <Compile Include=".\src\ngofile\S3\utils.py" />
+    <Compile Include=".\src\ngofile\S3\__init__.py" />
+    <Compile Include=".\src\ngofile\__init__.py" />
+    <Compile Include=".\src\ngofile\__main__.py" />
+    <Compile Include=".\tests\test_ngofilelist.py" />
+    <Compile Include=".\tests\test_ngofile_cli.py" />
+    <Compile Include=".\tests\test_ngopathlist.py" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="D:\code\python-ngofile\src\ngofile" />
-    <Folder Include="D:\code\python-ngofile\tests" />
-    <Folder Include="D:\code\python-ngofile" />
-    <Folder Include="D:\code\python-ngofile\docs\reference" />
-    <Folder Include="D:\code\python-ngofile\tests\a" />
-    <Folder Include="D:\code\python-ngofile\docs" />
-    <Folder Include="docs\" />
-    <Folder Include="docs\reference\" />
-    <Folder Include="src\" />
-    <Folder Include="src\ngofile\" />
-    <Folder Include="tests\" />
-    <Folder Include="tests\a\" />
+    <Folder Include=".\tests\a\bb" />
+    <Folder Include=".\src\ngofile" />
+    <Folder Include=".\tests\a\bb\bbb" />
+    <Folder Include=".\dist\docs\_static\js" />
+    <Folder Include=".\dist\docs\_sources" />
+    <Folder Include=".\docs\reference" />
+    <Folder Include=".\tests\a\aa\bbb" />
+    <Folder Include=".\src\ngofile.egg-info" />
+    <Folder Include="." />
+    <Folder Include=".\dist\docs\_sources\reference" />
+    <Folder Include=".\tests\a\aa" />
+    <Folder Include=".\tests\a\aa\aaa" />
+    <Folder Include=".\dist\docs\_static" />
+    <Folder Include=".\tests\a\aa\ccc" />
+    <Folder Include=".\tests\a\bb\aaa" />
+    <Folder Include=".\dist\docs\reference" />
+    <Folder Include=".\dist\docs" />
+    <Folder Include=".\tests" />
+    <Folder Include=".\docs" />
+    <Folder Include=".\src\ngofile\S3" />
+    <Folder Include=".\tests\a\bb\ccc" />
+    <Folder Include=".\dist\docs\_static\css" />
+    <Folder Include=".\tests\a" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
-  <ItemGroup>
-    <Interpreter Include=".tox\2.7">
-      <Id>Tox 2.7</Id>
-      <Description>2.7 python2.7 (x86)</Description>
-      <InterpreterPath>Scripts\python.exe</InterpreterPath>
-      <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
-      <Version>2.7</Version>
-      <Architecture>x86</Architecture>
-      <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
-    </Interpreter>
-    <Interpreter Include=".tox\3.4">
-      <Id>Tox 3.4</Id>
-      <Description>3.4 python3.4 (x86)</Description>
-      <InterpreterPath>Scripts\python.exe</InterpreterPath>
-      <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
-      <Version>3.4</Version>
-      <Architecture>x86</Architecture>
-      <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
-    </Interpreter>
-    <Interpreter Include=".tox\3.5">
-      <Id>Tox 3.5</Id>
-      <Description>3.5 python3.5 (x86)</Description>
-      <InterpreterPath>Scripts\python.exe</InterpreterPath>
-      <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
-      <Version>3.5</Version>
-      <Architecture>x86</Architecture>
-      <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
-    </Interpreter>
-    <Interpreter Include=".tox\pypy">
-      <Id>Tox pypy</Id>
-      <Description>pypy pypy (x86)</Description>
-      <InterpreterPath>bin\python.exe</InterpreterPath>
-      <WindowsInterpreterPath>bin\python.exe</WindowsInterpreterPath>
-      <Version>2.7</Version>
-      <Architecture>x86</Architecture>
-      <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
-    </Interpreter>
-  </ItemGroup>
 </Project>
