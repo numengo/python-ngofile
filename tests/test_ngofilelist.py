@@ -11,7 +11,6 @@ from builtins import object
 import logging
 import zipfile
 from pathlib import Path
-import pytest
 import ngofile
 
 test_file = Path(__file__).resolve()

@@ -16,9 +16,10 @@ import ngofile
 test_file = Path(__file__).resolve()
 test_dir = Path(__file__).resolve().parent
 
-logger = logging.getLogger(__name__)
 
 class TestNgoPathList(object):
+    logger = logging.getLogger(__name__)
+
     def test_singleton(self):
         a = ngofile.NgoPathList(test_dir)
         b = ngofile.NgoPathList()
@@ -33,5 +34,5 @@ class TestNgoPathList(object):
         assert not a.exists('dummy.dum')
 
 if __name__ == '__main__':
-    TestNgoPathList.test_singleton()
-    TestNgoPathList.test_exists()
+    # TestNgoPathList.test_singleton()
+    # TestNgoPathList.test_exists()

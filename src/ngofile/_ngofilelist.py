@@ -9,6 +9,7 @@ licence: GNU GPLv3
 """
 from __future__ import unicode_literals
 
+import logging
 from builtins import str
 import fnmatch
 import re
@@ -17,6 +18,10 @@ from builtins import range
 from pathlib import Path
 
 from .exceptions import NotExistingPathException, NotADirectoryException, NotAZipArchiveException
+from ._assert_path import assert_Path
+
+import gettext
+_ = gettext.gettext
 
 try:
     unicode = str
@@ -24,22 +29,7 @@ except Exception:
     pass
 
 
-def _assert_is_directory(path):
-    """ asserts a path exists and is a directory or throw exception
-
-    :param path: path to assert
-    :type path: string or pathlib.Path
-    :rtype: pathlib.Path """
-    if not isinstance(path, Path):
-        path = Path(str(path))
-    if not path.exists():
-        raise NotExistingPathException("%s does not exist." % path)
-    if not path.is_dir():
-        raise NotADirectoryException("%s is not a directory" % path)
-    return path
-
-
-def list_files(srcdir, includes=["*"], excludes=[], recursive=False):
+def list_files(srcdir, includes=["*"], excludes=[], recursive=False, in_parents=False):
     """ list files in a source directory with a list of given patterns 
     
     :param srcdir: source directory
@@ -50,17 +40,25 @@ def list_files(srcdir, includes=["*"], excludes=[], recursive=False):
     :type excludes: string or list of strings
     :param recursive:list files recursively
     :type recursive: boolean
+    :param in_parents: list files recursively in parents
+    :type in_parents: boolean
     :rtype: list of pathlib.Path
     """
-
+    logger = logging.getLogger(__name__)
     # first we define a helper function for recursive operations
     def list_files_in_dir(srcdir, includes, excludes, recursive):
+        for p in includes+excludes:
+            if '/' in p or '\\' in p:
+                raise Exception('need a pattern without subdirectories')
+        srcdir = assert_Path(srcdir)
+        if isinstance(srcdir,list):
+            return [list_files_in_dir(s,includes,excludes,recursive) for s in srcdir]
         ret = []
         if not srcdir.is_dir():
-            raise NotADirectoryException('%s is not a directory' % srcdir)
-        incl = r'|'.join([fnmatch.translate(x) for x in includes])
-        excl = r'|'.join([fnmatch.translate(x) for x in excludes]) or r'$.'
-        names_all = [_.name for _ in srcdir.glob('*')]
+            raise NotADirectoryException('',srcdir)
+        incl = r'|'.join([fnmatch.translate(x.lower()) for x in includes])
+        excl = r'|'.join([fnmatch.translate(x.lower()) for x in excludes]) or r'$.'
+        names_all = [x.name.lower() for x in srcdir.glob('*')]
         names_not_excl = [
             name for name in names_all if re.match(excl, name) is None
         ]
@@ -71,12 +69,24 @@ def list_files(srcdir, includes=["*"], excludes=[], recursive=False):
                                               recursive)
             elif re.match(incl, name):
                 ret.append(path)
+        logger.debug(_('found %(n)d files'%{'n':len(ret)}))
         return ret
 
-    srcdir = _assert_is_directory(srcdir)
+    srcdir = assert_Path(srcdir)
+    if not srcdir.exists():
+        return []
     if not isinstance(includes, list):
         includes = [includes]
-    return list_files_in_dir(srcdir, includes, excludes, recursive)
+    if not isinstance(excludes, list):
+        excludes = [excludes]
+    ret = list_files_in_dir(srcdir, includes, excludes, recursive)
+    if in_parents:
+        cur = srcdir.resolve()
+        while cur.stem:
+            ret += list_files_in_dir(cur.parent, includes, excludes+[str(cur.relative_to(cur.parent))], recursive)
+            cur = cur.parent
+        return ret
+    return ret
 
 
 #def list_files_to_move(srcdir,dest,excludes=[],recursive=False):

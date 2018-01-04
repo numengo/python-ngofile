@@ -36,11 +36,11 @@
   <ItemGroup>
 {% for env in pyenvs %}
     <Interpreter Include="{{env.dir}}\">
-      <Id>{{project_name}}_{{env.name}}</Id>
+      <Id>{{name}}_{{env.name}}</Id>
       <Description>{{env.description}}</Description>
       <InterpreterPath>{{env.dir}}\Scripts\python.EXE</InterpreterPath>
       <WindowsInterpreterPath>{{env.dir}}\Scripts\pythonw.exe</WindowsInterpreterPath>
-      <Version>{{env.pyver|join('.')}}</Version>
+      <Version>{{env.pyver}}</Version>
       <Architecture>{{env.archi}}</Architecture>
       <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
     </Interpreter>

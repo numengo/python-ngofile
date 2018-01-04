@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Module that contains the command line app.
 
@@ -14,7 +15,6 @@ Why does this file exist, and why not put this in __main__?
 
   Also see (1) from http://click.pocoo.org/5/setuptools/#setuptools-integration
 """
-from __future__ import unicode_literals
 import click
 
 

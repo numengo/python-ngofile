@@ -23,7 +23,7 @@ if os.getenv('SPELLCHECK'):
 source_suffix = '.rst'
 master_doc = 'index'
 project = u'NgoFile'
-year = '2017'
+year = '2018'
 author = u'C\xe9dric ROMAN'
 copyright = '{0}, {1}'.format(year, author)
 version = release = u'0.1.0'

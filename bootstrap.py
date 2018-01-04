@@ -27,7 +27,7 @@ if __name__ == "__main__":
         except subprocess.CalledProcessError:
             subprocess.check_call([sys.executable, "-m", "virtualenv", env_path])
         print("Installing `jinja2` and `matrix` into bootstrap environment...")
-        subprocess.check_call([join(bin_path, "pip"), "install", "jinja2", "matrix"])
+        subprocess.check_call([join(bin_path, "pip"), "install", "jinja2" "py" , "matrix"])
     activate = join(bin_path, "activate_this.py")
     # noinspection PyCompatibility
     exec(compile(open(activate, "rb").read(), activate, "exec"), dict(__file__=activate))

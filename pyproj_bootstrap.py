@@ -14,62 +14,48 @@ from os.path import exists
 from os.path import join
 from pathlib import Path
 import matrix
-
+from xml import etree
+from xml.etree import ElementTree as ET
+import re
+import py.path 
+ 
 if __name__ == "__main__":
     base_path = Path(__file__).resolve().parent
     print("Project path: {0}".format(base_path))
-    
-    def get_binary_archi(filepath):
-        """ get binary architecture of a binary file by alternative method to win32file (not working here) 
-        
-        from https://stackoverflow.com/questions/1345632/determine-if-an-executable-or-library-is-32-or-64-bits-on-windows 
-        """
-        if not isinstance(filepath,Path):
-            filepath = Path(filepath)
-        f = filepath.open('rb')
-        s = f.read(2)
-        if s!="MZ":
-            f.close()
-            raise Exception("%s is not a binary file"%filepath.resolve())
-        else:
-            import struct
-            f.seek(60)
-            s=f.read(4)
-            header_offset=struct.unpack("<L", s)[0]
-            f.seek(header_offset+4)
-            s=f.read(2)
-            f.close()
-            machine=struct.unpack("<H", s)[0]
-            IMAGE_FILE_MACHINE_I386=332
-            IMAGE_FILE_MACHINE_IA64=512
-            IMAGE_FILE_MACHINE_AMD64=34404
-            archis = {IMAGE_FILE_MACHINE_I386:'x86',IMAGE_FILE_MACHINE_IA64:'IA64',IMAGE_FILE_MACHINE_AMD64:'x64'}
-            return archis.get(machine,"Unknown architecture")
-
+ 
     def extract_pyver_from_dir(pydirpath):
         """ extract python version from binary found in a directory on windows """
         if not isinstance(pydirpath,Path):
             pydirpath = Path(pydirpath)
+        print('pydirpath: %s'%str(pydirpath))
         if os.name == 'nt': # only works for windows, looking for dlls
-            dlls = sorted(pydirpath.glob('**/python*.dll'))
-            import re
-            dlls = [dll for dll in dlls if re.match('python[0-9][0-9]\.',dll.name) is not None]
-            if len(dlls)==1:
-                archi = get_binary_archi(dlls[0])
-                import win32api
-                info = win32api.GetFileVersionInfo(str(dlls[0]), "\\")
-                ms = info['FileVersionMS']
-                (M,m) = win32api.HIWORD(ms), win32api.LOWORD(ms)
-                return (M,m), archi
-            # case pypy: we check pypy dll for archi and lib-python directory for version
-            dlls = sorted(pydirpath.glob('**/libpypy*.dll'))
-            if len(dlls)==1:
-                archi = get_binary_archi(dlls[0])
-                lps = sorted(pydirpath.joinpath('lib-python').glob('*'))
-                assert len(lps) == 1
-                (M,m) = lps[0].name.split('.') # split major/minor
-                return (int(M),int(m)), archi
-                
+            dlls  = sorted(pydirpath.glob('python*.exe'))
+            dlls += sorted(pydirpath.glob('bin\\python*.exe'))
+            dlls += sorted(pydirpath.glob('Scripts\\python*.exe'))
+        assert len(dlls) > 0, "no executable python*.exe found in directory %s"%(pydirpath)
+        pyexepath = dlls[0].resolve()
+        print(str(pyexepath))
+        pyexepath = py.path.local(str(pyexepath))
+        out = pyexepath.sysexec("-c",
+                                       "import sys; "
+                                       "print(sys.executable);"
+                                       "print(list(sys.version_info)); "
+                                       "import platform;"
+                                       "print(platform.architecture()[0]);"
+                                       "print(sys.version);"
+                                       )
+        lines = out.splitlines()
+        executable = lines.pop(0)
+        ver = eval(lines.pop(0))
+        version_info = '%i.%i.%i'%(ver[0],ver[1],ver[2])
+        archi = lines.pop(0)
+        version = "\n".join(lines)
+        return dict(
+            executable=executable,
+            version_info=version_info,
+            version=version,
+            archi=archi)
+              
 
     tox_environments = {}
     for (alias, conf) in matrix.from_file(str(base_path.joinpath("setup.cfg"))).items():
@@ -87,7 +73,11 @@ if __name__ == "__main__":
             tox_environments[alias].update(env_vars=env_vars.split())
         print('found python environment', (alias, tox_environments[alias]['python']))
         envp = Path('.tox/%s'%alias)
-        ver, archi = extract_pyver_from_dir(envp)
+        dirpath = Path(__file__).resolve().parent.joinpath(envp)
+        version_info = extract_pyver_from_dir(dirpath)
+        #print(version_info)
+        ver = version_info['version_info']
+        archi = version_info['archi']
         tox_environments[alias].update({'pyver':ver,'archi':archi,'path':envp})
         
 
@@ -121,9 +111,14 @@ if __name__ == "__main__":
     assert len(pyprojs) == 1, "only works with one file .pyproj in the directory"
     pyproj = pyprojs[0]
         
-    from lxml import etree
-    root = etree.parse(str(pyproj)) # parse pyproj file
-    nsmap = root.getroot().nsmap # get namespace
+    root = ET.parse(str(pyproj)) # parse pyproj file
+            
+    def namespace(element):
+        m = re.match('\{.*\}', element.tag)
+        return m.group(0) if m else ''
+    nsmap = namespace(root.getroot())[1:-1]
+    ET.register_namespace('',nsmap)   
+    print('nsmap: %s'%nsmap)
     pnode = root.getroot() # get main node
     
     # add includes and source files
@@ -133,9 +128,9 @@ if __name__ == "__main__":
             for i in par: # remove existing items
                 par.remove(i)
         else:
-            par = etree.SubElement(pnode,'ItemGroup') 
+            par = ET.SubElement(pnode,'ItemGroup') 
         for f in fs:
-            etree.SubElement(par,el,Include=str(f))
+            ET.SubElement(par,el,Include=str(f))
     
     # adds Python environments
     # remove existing ones
@@ -144,27 +139,26 @@ if __name__ == "__main__":
         for i in par: # remove existing items
             par.remove(i)
     else:
-        par = etree.SubElement(pnode,'ItemGroup') 
+        par = ET.SubElement(pnode,'ItemGroup') 
     # adds environments
     for alias, toxenv in tox_environments.items():
         toxdir = toxenv['path']
-        i = etree.SubElement(par,'Interpreter',Include=str(toxdir),nsmap=nsmap)
-        etree.SubElement(i,"Id").text = "Tox %s" % (alias)
-        etree.SubElement(i,"Description").text = "%s %s (%s)" % (alias,toxenv['python'],toxenv['archi'])
+        i = ET.SubElement(par,'Interpreter',Include=str(toxdir),nsmap=nsmap)
+        ET.SubElement(i,"Id").text = "Tox %s" % (alias)
+        ET.SubElement(i,"Description").text = "%s %s (%s)" % (alias,toxenv['python'],toxenv['archi'])
         pyexe = sorted(toxdir.glob('**/python.exe'))
         assert len(pyexe)==1,pyexe
-        etree.SubElement(i,"InterpreterPath").text = str(pyexe[0].relative_to(toxdir))
+        ET.SubElement(i,"InterpreterPath").text = str(pyexe[0].relative_to(toxdir))
         pywexe = sorted(toxdir.glob('**/pythonw.exe'))
         if len(pywexe)==0:
             pywexe = pyexe # use normal interpreter (case for pypy)
         assert len(pywexe)==1,pywexe
-        etree.SubElement(i,"WindowsInterpreterPath").text = str(pywexe[0].relative_to(toxdir))
-        etree.SubElement(i,"Version").text = "%d.%d"%(toxenv['pyver'])
-        etree.SubElement(i,"Architecture").text = "%s"%(toxenv['archi'])
-        pyenvvars = etree.SubElement(i,"PathEnvironmentVariable")
+        ET.SubElement(i,"WindowsInterpreterPath").text = str(pywexe[0].relative_to(toxdir))
+        ET.SubElement(i,"Version").text = "%s"%(toxenv['pyver'])
+        ET.SubElement(i,"Architecture").text = "%s"%(toxenv['archi'])
+        pyenvvars = ET.SubElement(i,"PathEnvironmentVariable")
         pyenvvars.text = "PYTHONPATH"
         # TODO, to add environment variables
         for v in toxenv['env_vars']:
             raise Exception('not implemented yet')
-        
-    root.write(str(pyproj),pretty_print=True, xml_declaration=True, encoding='UTF-8')    
+    root.write(str(pyproj), xml_declaration=True, encoding='UTF-8')    

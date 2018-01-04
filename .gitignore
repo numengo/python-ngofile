@@ -27,7 +27,7 @@ bak
 *.egg-info
 dist
 build
-eggs
+.eggs
 parts
 bin
 binaries
@@ -80,7 +80,7 @@ docs/_build
 *~
 .*.sw[po]
 .build
-.ve
+.vs
 .bootstrap
 .pypirc
 

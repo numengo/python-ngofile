@@ -8,13 +8,19 @@ import fnmatch
 import logging
 import os
 import os.path
+from pathlib import Path
 import re
 import shutil
 import sys
+import gettext
 from builtins import range
 from builtins import str
 
+from .exceptions import NgoFileException, NotExistingPathException, NotADirectoryException
+from ._assert_path import assert_Path
+
 enc = sys.stdout.encoding or "cp850"
+_ = gettext.gettext
 
 
 def ngocopy(src, dst):
@@ -90,35 +96,45 @@ def ngocopytree(src, dst, excludes=[], includes=[], recursive=True):
         raise Exception(errors)
 
 
-def advanced_copy(src, dst, excludes=[], includes=[], recursive=True):
-    """
-    copy src to destination.  frontent to deal with all cases (src file or directory)
-    
-    excludes: is a list of pattern files to exclude
-    includes: is a list of pattern file to include
-    recursive: option for recursive copy (default is true)
-    """
+def advanced_copy(src, dst, excludes=[], includes=[], recursive=True,create_directory=True):
     logger = logging.getLogger(__name__)
-    # make sure to convert string from ngopath
-    # convert everything to ngopath and back to string
-    if not os.path.isdir(src) and not os.path.isfile(src):
-        if os.path.isdir(os.path.dirname(src)):
-            includes = [os.path.basename(src)]
-            recursive = False
-            src = os.path.dirname(src)
-    if not os.path.exists(src):
-        logger.error('source  ' + src + ' does not exist')
+    
+    src = assert_Path(src) # not flag exits because it could have a pattern
+    dst = assert_Path(dst) # not is dir because it might not exist if it s just being created
+    
+    for d in dst:
+        for s in src:
+            advanced_copy(s, d, excludes, includes, recursive)
+            
+    # treat case src is given as a pattern and does not really exist, 
+    # convert it to an include
+    if not src.is_dir() and not src.exists():
+        if src.parent.is_dir():
+            includes = [src.name] # append ??
+            recursive=False
+            src = src.parent
+    if not src.exists():
+        e = NotExistingPathException('',src)
+        logger.error(e)
         return
 
     # do we need to create dst directories ?
-    dirs = dst.split(os.path.sep)
-    for i in range(len(dirs)):
-        d = os.path.sep.join(dirs[:i + 1])
-        if not os.path.exists(d):
-            logger.debug('creating directory ' + str(d, enc))
-            os.makedirs(d)
+    parts = dst.parts
+    cur = Path(parts[0])
+    assert cur.exists(), '%s does not exist' % str(cur, enc)
+    for p in parts[1:]:
+        cur = cur.joinpath(p)
+        if not cur.exists():
+            if not create_directory:
+                e= NotADirectoryException(_('Use create_directory option.'),cur)
+                logger.exception(e)
+                raise e
+            logger.debug(_('creating directory ')+str(cur, enc))
+            os.makedirs(str(cur.resolve()))
 
-    if os.path.isfile(src):
+    if src.is_file():
+        logger.debug('ngocopy(%s,%s)'%(str(src),str(dst)))
         ngocopy(src, dst)
     else:
+        logger.debug('ngocopytree(%s,%s,...)'%(str(src),str(dst)))
         ngocopytree(src, dst, excludes, includes, recursive)
