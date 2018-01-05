@@ -110,9 +110,7 @@ setup(
     entry_points={
         'console_scripts': [
             'advanced_copy=ngofile.cli:advanced_copy_cli',
-            'list_files=ngofile.cli:list_files_cli',
-            'pathlist_exists=ngofile.cli:pathlist_exists_cli',
-            'pathlist_matches=ngofile.cli:pathlist_matches_cli',
+            'list_files=ngofile.cli:list_files_cli'
         ]
     },
     classifiers=[

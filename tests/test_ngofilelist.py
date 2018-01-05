@@ -17,9 +17,9 @@ test_file = Path(__file__).resolve()
 test_dir = Path(__file__).resolve().parent
 test_dir_a = test_dir.joinpath('a')
 
-logger = logging.getLogger(__name__)
 
 class TestNgoFileList(object):
+    logger = logging.getLogger(__name__)
     def test_list_files_with_patterns(self):
         # works with Path object
         fs1 = ngofile.list_files(test_dir_a, recursive=True)

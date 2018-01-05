@@ -34,5 +34,6 @@ class TestNgoPathList(object):
         assert not a.exists('dummy.dum')
 
 if __name__ == '__main__':
+    pass
     # TestNgoPathList.test_singleton()
     # TestNgoPathList.test_exists()
