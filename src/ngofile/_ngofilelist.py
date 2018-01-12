@@ -47,13 +47,30 @@ def list_files(srcdir, includes=["*"], excludes=[], recursive=False, in_parents=
     logger = logging.getLogger(__name__)
     # first we define a helper function for recursive operations
     def list_files_in_dir(srcdir, includes, excludes, recursive):
-        for p in includes+excludes:
-            if '/' in p or '\\' in p:
-                raise Exception('need a pattern without subdirectories')
+        ret = []
+        for p in includes:
+            includes2 = includes
+            p2 = p.replace('\\','/')
+            if '/' in p2:
+                pa, pb = p2.lsplit('/',1)
+                includes2.pop(p)
+                includes2.append(pb)
+                if srcdir.joinpath(pa).exists():
+                    ls = list_files_in_dir(srcdir.joinpath(pa),includes2,excludes,recursive)
+                    ret += ls
+        for p in excludes:
+            excludes2 = excludes
+            p2 = p.replace('\\','/')
+            if '/' in p2:
+                pa, pb = p2.lsplit('/',1)
+                excludes2.pop(p)
+                excludes2.append(pb)
+                if srcdir.joinpath(pa).exists():
+                    ls = list_files_in_dir(srcdir.joinpath(pa),includes,excludes2,recursive)
+                    ret += ls
         srcdir = assert_Path(srcdir)
         if isinstance(srcdir,list):
             return [list_files_in_dir(s,includes,excludes,recursive) for s in srcdir]
-        ret = []
         if not srcdir.is_dir():
             raise NotADirectoryException('',srcdir)
         incl = r'|'.join([fnmatch.translate(x.lower()) for x in includes])

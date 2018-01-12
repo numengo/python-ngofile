@@ -33,7 +33,8 @@ class NgoPathList(object):
         if `pathlist` is given as keyword argument used as pathlist."""
         self.logger = logging.getLogger(__name__)
         for arg in args:
-            self.append(arg)
+            if arg:
+                self.append(arg)
         if 'pathlist' in list(kwargs.keys()):
             self.set_pathlist(kwargs.get('pathlist'))
 
