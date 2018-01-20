@@ -75,9 +75,9 @@ def list_files(srcdir, includes=["*"], excludes=[], recursive=False, in_parents=
             raise NotADirectoryException('',srcdir)
         incl = r'|'.join([fnmatch.translate(x.lower()) for x in includes])
         excl = r'|'.join([fnmatch.translate(x.lower()) for x in excludes]) or r'$.'
-        names_all = [x.name.lower() for x in srcdir.glob('*')]
+        names_all = [x.name for x in srcdir.glob('*')]
         names_not_excl = [
-            name for name in names_all if re.match(excl, name) is None
+            name for name in names_all if re.match(excl, name.lower()) is None
         ]
         for name in names_not_excl:
             path = srcdir.joinpath(name)

@@ -26,6 +26,7 @@ class NgoPathList(object):
             cls._instance = super(NgoPathList, cls).__new__(cls)
             return cls._instance
         else:
+            cls._pathlist = []
             return super(NgoPathList, cls).__new__(cls)
 
     def __init__(self,*args,**kwargs):

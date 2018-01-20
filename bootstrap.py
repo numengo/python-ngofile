@@ -44,24 +44,24 @@ if __name__ == "__main__":
     )
     
 
-    tox_environments = {}
+    toxEnvironments = {}
     for (alias, conf) in matrix.from_file(join(base_path, "setup.cfg")).items():
         python = conf["python_versions"]
         deps = conf["dependencies"]
-        tox_environments[alias] = {
+        toxEnvironments[alias] = {
             "python": "python" + python if "py" not in python else python,
             "deps": deps.split(),
         }
         if "coverage_flags" in conf:
             cover = {"false": False, "true": True}[conf["coverage_flags"].lower()]
-            tox_environments[alias].update(cover=cover)
+            toxEnvironments[alias].update(cover=cover)
         if "environment_variables" in conf:
-            env_vars = conf["environment_variables"]
-            tox_environments[alias].update(env_vars=env_vars.split())
+            envVars = conf["environment_variables"]
+            toxEnvironments[alias].update(envVars=envVars.split())
 
     for name in os.listdir(join(".templates")):
         if not name.startswith("template"):
             with open(join(base_path, name), "w") as fh:
-                fh.write(jinja.get_template(name).render(tox_environments=tox_environments))
+                fh.write(jinja.get_template(name).render(toxEnvironments=toxEnvironments))
             print("Wrote {}".format(name))
     print("DONE.")

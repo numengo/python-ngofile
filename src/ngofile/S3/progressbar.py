@@ -44,7 +44,7 @@ from builtins import range
 from past.utils import old_div
 from builtins import object
 __author__ = "Nilton Volpato"
-__author_email__ = "first-name dot last-name @ gmail.com"
+__authorEmail__ = "first-name dot last-name @ gmail.com"
 __date__ = "2006-05-07"
 __version__ = "2.2"
 

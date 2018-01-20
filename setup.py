@@ -16,7 +16,7 @@ package = 'ngofile'
 description = 'misc file utilities'
 url='https://github.com/numengo/python-ngofile'
 author = 'Cédric ROMAN'
-author_email = 'roman@numengo.com'
+authorEmail = 'roman@numengo.com'
 license = 'GNU General Public License v3'
 
 
@@ -93,7 +93,7 @@ setup(
         re.sub(':[a-z]+:`~?(.*?)`', r'``\1``', read('CHANGELOG.rst'))
     ),
     author=author,
-    author_email=author_email,
+    authorEmail=authorEmail,
     url=url,
     packages=find_packages('src'),
     package_dir={'': 'src'},
