@@ -17,23 +17,23 @@ test_file = Path(__file__).resolve()
 test_dir = Path(__file__).resolve().parent
 
 
-class TestNgoPathList(object):
+class TestPathList(object):
     logger = logging.getLogger(__name__)
 
     def test_singleton(self):
-        a = ngofile.NgoPathList(test_dir)
-        b = ngofile.NgoPathList()
+        a = ngofile.PathList(test_dir)
+        b = ngofile.PathList()
         b.append(str(
             test_dir))  # test_dir is already added during initialisation of a
         assert len(a.pathlist) == 1
 
     def test_exists(self):
-        a = ngofile.NgoPathList(test_dir)
+        a = ngofile.PathList(test_dir)
         p2 = a.pick_first(test_file.name)
         assert p2.exists()
         assert not a.exists('dummy.dum')
 
 if __name__ == '__main__':
     pass
-    # TestNgoPathList.test_singleton()
-    # TestNgoPathList.test_exists()
+    # TestPathList.test_singleton()
+    # TestPathList.test_exists()

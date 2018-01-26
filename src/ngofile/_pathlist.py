@@ -9,25 +9,25 @@ from builtins import object
 from builtins import str
 from pathlib import Path
 
-from ._ngofilelist import list_files
+from ._list_files import list_files
 from ._assert_path import assert_Path
 try:
     unicode = str
 except Exception:
     pass
 
-class NgoPathList(object):
+class PathList(object):
     """ path list manager """
     _instance = None
     _pathlist = []
 
     def __new__(cls, *args, **kwargs):
         if not cls._instance and kwargs.get('singleton',True):
-            cls._instance = super(NgoPathList, cls).__new__(cls)
+            cls._instance = super(PathList, cls).__new__(cls)
             return cls._instance
         else:
             cls._pathlist = []
-            return super(NgoPathList, cls).__new__(cls)
+            return super(PathList, cls).__new__(cls)
 
     def __init__(self,*args,**kwargs):
         """ appends each arg as a path of pathlist
@@ -49,26 +49,30 @@ class NgoPathList(object):
 
     @pathlist.setter
     def set_pathlist(self, pathlist):
-        """ set the pathlist from a list 
-        :rtype pathlist: list of string or pathlib.Path"""
+        """ set the pathlist from a list
+        :param pathlist: path list to set
+        :rtype pathlist: list"""
         for p in pathlist:
             self.append(p)
 
     def as_strings(self):
         """ returns the pathlist as a list of string
-        :rtype: list of strings"""
+        :rtype: list"""
         return [str(p) for p in self._pathlist]
 
     def append(self, path):
-        """ append a path to pathlist
+        """ append a path to pathlist (only if it exists)
 
         :param path: path to assert
-        :type path: string or pathlib.Path"""
+        :type path: str/pathlib.Path"""
         if isinstance(path,list):
             return [self.append(p) for p in path]
-        p = assert_Path(path).resolve()
+        p = assert_Path(path)
         if str(p) not in self.as_strings():
-            self._pathlist.append(p.resolve())
+            if p.exists():
+                self._pathlist.append(p.resolve())
+            else:
+                 self.logger.warning('%s does not exist' % p)
         else:
              self.logger.warning('%s already in pathlist' % p)
 
@@ -76,7 +80,7 @@ class NgoPathList(object):
         """ check if a path exists in pathlist
 
         :param path: path or pattern
-        :type path: string or pathlib.Path
+        :type path: str/pathlib.Path
         :rtype: boolean"""
         if isinstance(path,list):
             return [self.exists(p) for p in path]
@@ -86,37 +90,24 @@ class NgoPathList(object):
         """ picks the first existing match
 
         :param path: path or pattern
-        :type path: string or pathlib.Path
-        :rtype: pathlib.Path or None """
+        :type path: str/pathlib.Path
+        :rtype: pathlib.Path/None """
         if isinstance(path,list):
             return [self.exists(p) for p in path]
         ms = self.list_files(path)
         if len(ms) > 0:
             return ms[0]
 
-    #def all_matches(self, path):
-    #    """ returns all matches in pathlist
-    #
-    #    :param path: path or pattern
-    #    :type path: string or pathlib.Path
-    #    :rtype: list of pathlib.Path """
-    #    if isinstance(path,list):
-    #        return [self.exists(p) for p in path]
-    #    matches = [p.glob(str(path)) for p in self._pathlist]
-    #    return [item for sublist in matches for item in sublist]
-    #    
     def list_files(self,includes=["*"], excludes=[], recursive=False, in_parents=False):
         """ list files in a source directory with a list of given patterns 
         
         :param includes: pattern or list of patterns ('*.py', '*.txt', etc...)
-        :type includes: string or list of strings
+        :type includes: str/list
         :param excludes: patterns to exclude
-        :type excludes: string or list of strings
+        :type excludes: str/list
         :param recursive:list files recursively
-        :type recursive: boolean
         :param in_parents: list files recursively in parents
-        :type in_parents: boolean
-        :rtype: list of pathlib.Path
+        :rtype: ngomodel.TypedList(pathlib.Path)
         """
         ret = []
         for p in self._pathlist:

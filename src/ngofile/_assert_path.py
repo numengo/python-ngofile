@@ -32,7 +32,7 @@ def assert_Path(path,exists=False,is_dir=False, vector=True):
         return [assert_Path(p,exists,is_dir) for p in path]
     if not isinstance(path,Path):
         try:
-            path = Path(str(path))
+            path = Path(path.__str__())
         except TypeError:
             e = NgoFileException(_('unable to create path from %(path)s' % {'path':str(path)}))
             logger.exception(e)

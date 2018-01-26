@@ -23,13 +23,15 @@ enc = sys.stdout.encoding or "cp850"
 _ = gettext.gettext
 
 
-def ngocopy(src, dst):
+def _copy(src, dst):
     """ copy a file src to dst (directory).
     
     if dst exists and is the same, nothing is done
 
     :param src: source file or directory
+    :type src: pathlib.Path
     :param dst: destination file or directory
+    :type dst: pathlib.Path
     """
     logger = logging.getLogger(__name__)
     if os.path.exists(dst) and os.path.isdir(dst):
@@ -46,12 +48,18 @@ def ngocopy(src, dst):
         shutil.copy2(src, dst)
 
 
-def ngocopytree(src, dst, excludes=[], includes=[], recursive=True):
+def _copytree(src, dst, excludes=[], includes=[], recursive=True):
     """ copy a directory structure src to destination
     
-    excludes: is a list of pattern files to exclude
-    includes: is a list of pattern file to include
-    recursive: option for recursive copy (default is true)
+    :param src: source file or directory
+    :type src: pathlib.Path
+    :param dst: destination file or directory
+    :type dst: pathlib.Path
+    :param excludes: list of patterns to exclude
+    :type excludes: list
+    :param includes: list of patterns to include
+    :type includes: list
+    :param recursive: recursive copy
     """
     logger = logging.getLogger(__name__)
     # make sure to convert string from ngopath
@@ -75,13 +83,13 @@ def ngocopytree(src, dst, excludes=[], includes=[], recursive=True):
         try:
             if os.path.isdir(srcname):
                 if recursive:
-                    ngocopytree(srcname, dstname, excludes, includes,
+                    _copytree(srcname, dstname, excludes, includes,
                                 recursive)
                 if re.match(incl, name) and recursive:
-                    ngocopytree(srcname, dstname, excludes, includes,
+                    _copytree(srcname, dstname, excludes, includes,
                                 recursive)
             elif re.match(incl, name):
-                ngocopy(srcname, dstname)
+                _copy(srcname, dstname)
         except (IOError, os.error) as why:
             errors.append((srcname, dstname, str(why)))
     try:
@@ -97,6 +105,19 @@ def ngocopytree(src, dst, excludes=[], includes=[], recursive=True):
 
 
 def advanced_copy(src, dst, excludes=[], includes=[], recursive=True,create_directory=True):
+    """ copy a directory structure src to destination
+    
+    :param src: source file or directory
+    :type src: pathlib.Path
+    :param dst: destination file or directory
+    :type dst: pathlib.Path
+    :param excludes: list of patterns to exclude
+    :type excludes: list
+    :param includes: list of patterns to include
+    :type includes: list
+    :param recursive: recursive copy
+    :param create_directory: create missing directories
+    """
     logger = logging.getLogger(__name__)
     
     src = assert_Path(src) # not flag exits because it could have a pattern
@@ -133,8 +154,8 @@ def advanced_copy(src, dst, excludes=[], includes=[], recursive=True,create_dire
             os.makedirs(str(cur.resolve()))
 
     if src.is_file():
-        logger.debug('ngocopy(%s,%s)'%(str(src),str(dst)))
-        ngocopy(src, dst)
+        logger.debug('_copy(%s,%s)'%(str(src),str(dst)))
+        _copy(src, dst)
     else:
-        logger.debug('ngocopytree(%s,%s,...)'%(str(src),str(dst)))
-        ngocopytree(src, dst, excludes, includes, recursive)
+        logger.debug('_copytree(%s,%s,...)'%(str(src),str(dst)))
+        _copytree(src, dst, excludes, includes, recursive)

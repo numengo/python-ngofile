@@ -5,9 +5,9 @@ __version__ = '0.1.0'
 
 import apipkg
 apipkg.initpkg(__name__, {
-    'advanced_copy': "._ngocopy:advanced_copy",
+    'advanced_copy': "._copy:advanced_copy",
     'assert_Path': "._assert_path:assert_Path",
-    'list_files': "._ngofilelist:list_files",
-    'list_files_in_zip': "._ngofilelist:list_files_in_zip",
-    'NgoPathList': "._ngopathlist:NgoPathList",
+    'list_files': "._list_files:list_files",
+    'list_files_in_zip': "._list_files:list_files_in_zip",
+    'PathList': "._pathlist:PathList",
 })

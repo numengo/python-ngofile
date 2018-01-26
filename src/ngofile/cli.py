@@ -17,9 +17,9 @@ Why does this file exist, and why not put this in __main__?
 """
 import click
 
-from ._ngocopy import advanced_copy
-from ._ngofilelist import list_files
-from ._ngopathlist import NgoPathList
+from ._copy import advanced_copy
+from ._list_files import list_files
+from ._pathlist import PathList
 
 import gettext
 _ = gettext.gettext

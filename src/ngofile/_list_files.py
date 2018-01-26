@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """ 
-ngofilelist.py
+_list_files.py
 
 utilities to list files in a directory, or a zip file
 
@@ -33,16 +33,14 @@ def list_files(srcdir, includes=["*"], excludes=[], recursive=False, in_parents=
     """ list files in a source directory with a list of given patterns 
     
     :param srcdir: source directory
-    :type srcdir: string or pathlib.Path
+    :type srcdir: str/pathlib.Path
     :param includes: pattern or list of patterns ('*.py', '*.txt', etc...)
-    :type includes: string or list of strings
-    :param excludes: patterns to exclude
-    :type excludes: string or list of strings
+    :type includes: str/list
+    :param excludes: pattern or patterns to exclude
+    :type excludes: str/list
     :param recursive:list files recursively
-    :type recursive: boolean
     :param in_parents: list files recursively in parents
-    :type in_parents: boolean
-    :rtype: list of pathlib.Path
+    :rtype: ngomodel.TypedList(pathlib.Path)
     """
     logger = logging.getLogger(__name__)
     # first we define a helper function for recursive operations
@@ -126,12 +124,11 @@ def list_files_in_zip(archive, includes=["*"], excludes=[], recursive=False):
     :param archive: zipfile to explore
     :type archive: zipfile.ZipFile
     :param includes: pattern or list of patterns ('*.py', '*.txt', etc...)
-    :type includes: string or list of strings
+    :type includes: str/list
     :param excludes: patterns to exclude
-    :type excludes: string or list of strings
-    :param recursive:list files recursively
-    :type recursive: boolean
-    :rtype: list of strings
+    :type excludes: str/list
+    :param recursive: list files recursively
+    :rtype: list
     """
     if not isinstance(includes, list):
         includes = [includes]

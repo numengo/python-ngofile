@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-""" Unit tests for ngofilelist
+""" Unit tests for _list_files
 
 setup.py - created on 2017/11/15 08:44:32
 author: Cedric ROMAN
@@ -18,7 +18,7 @@ test_dir = Path(__file__).resolve().parent
 test_dir_a = test_dir.joinpath('a')
 
 
-class TestNgoFileList(object):
+class Test_list_files(object):
     logger = logging.getLogger(__name__)
     def test_list_files_with_patterns(self):
         # works with Path object
