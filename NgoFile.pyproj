@@ -34,6 +34,7 @@
     <Compile Include="src\ngofile\_pathlist.py" />
     <Compile Include="src\ngofile\__init__.py" />
     <Compile Include="src\ngofile\__main__.py" />
+    <Compile Include="tests\run-tests.py" />
     <Compile Include="tests\test_list_files.py" />
     <Compile Include="tests\test_ngofile_cli.py" />
     <Compile Include="tests\test_pathlist.py" />

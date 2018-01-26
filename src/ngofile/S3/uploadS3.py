@@ -1,22 +1,24 @@
 # -*- coding: utf-8 -*-
 
 #!/usr/bin/python
-from __future__ import division
 from __future__ import absolute_import
+from __future__ import division
 from __future__ import unicode_literals
-from past.utils import old_div
+
 import logging
 import optparse
 import os
 import sys
 import time
 
-from . import progressbar
-from . import utils
 from boto.exception import S3ResponseError
 from boto.s3.connection import OrdinaryCallingFormat
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
+from past.utils import old_div
+
+from . import progressbar
+from . import utils
 
 AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY = utils.getIdentifiers()
 

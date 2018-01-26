@@ -6,12 +6,17 @@ author: Cedric ROMAN
 email: roman@numengo.com
 licence: GNU GPLv3 """
 from __future__ import unicode_literals
-from builtins import str
-from builtins import object
+
 import logging
 import zipfile
+from builtins import object
+from builtins import str
 from pathlib import Path
+
+import pytest
+
 import ngofile
+import ngofile.exceptions
 
 test_file = Path(__file__).resolve()
 test_dir = Path(__file__).resolve().parent
@@ -20,6 +25,7 @@ test_dir_a = test_dir.joinpath('a')
 
 class Test_list_files(object):
     logger = logging.getLogger(__name__)
+
     def test_list_files_with_patterns(self):
         # works with Path object
         fs1 = ngofile.list_files(test_dir_a, recursive=True)
@@ -38,7 +44,7 @@ class Test_list_files(object):
             test_dir_a, "*.data", ["bb", "bbb"], recursive=True)
         assert len(fs) == 4
 
-        with pytest.raises(ngofile.NotADirectoryException):
+        with pytest.raises(ngofile.exceptions.NotADirectoryException):
             fs = ngofile.list_files(test_file)
 
     def test_list_files_in_zip(self):

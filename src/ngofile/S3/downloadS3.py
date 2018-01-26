@@ -2,15 +2,16 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
-from builtins import str
+
 import logging
 import optparse
 import os
 import sys
 import time
+from builtins import str
 
-from . import progressbar
 #!/usr/bin/python
+from . import progressbar
 from . import utils
 
 #AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY = utils.getIdentifiers()

@@ -5,19 +5,22 @@ from __future__ import unicode_literals
 
 import filecmp
 import fnmatch
+import gettext
 import logging
 import os
 import os.path
-from pathlib import Path
 import re
 import shutil
 import sys
-import gettext
 from builtins import range
 from builtins import str
+from pathlib import Path
 
-from .exceptions import NgoFileException, NotExistingPathException, NotADirectoryException
 from ._assert_path import assert_Path
+from .exceptions import CopyException
+from .exceptions import NgoFileException
+from .exceptions import NotADirectoryException
+from .exceptions import NotExistingPathException
 
 enc = sys.stdout.encoding or "cp850"
 _ = gettext.gettext
@@ -83,11 +86,9 @@ def _copytree(src, dst, excludes=[], includes=[], recursive=True):
         try:
             if os.path.isdir(srcname):
                 if recursive:
-                    _copytree(srcname, dstname, excludes, includes,
-                                recursive)
+                    _copytree(srcname, dstname, excludes, includes, recursive)
                 if re.match(incl, name) and recursive:
-                    _copytree(srcname, dstname, excludes, includes,
-                                recursive)
+                    _copytree(srcname, dstname, excludes, includes, recursive)
             elif re.match(incl, name):
                 _copy(srcname, dstname)
         except (IOError, os.error) as why:
@@ -101,10 +102,15 @@ def _copytree(src, dst, excludes=[], includes=[], recursive=True):
     except OSError as why:
         errors.extend((src, dst, str(why)))
     if errors:
-        raise Exception(errors)
+        raise CopyException(errors)
 
 
-def advanced_copy(src, dst, excludes=[], includes=[], recursive=True,create_directory=True):
+def advanced_copy(src,
+                  dst,
+                  excludes=[],
+                  includes=[],
+                  recursive=True,
+                  create_directory=True):
     """ copy a directory structure src to destination
     
     :param src: source file or directory
@@ -119,23 +125,25 @@ def advanced_copy(src, dst, excludes=[], includes=[], recursive=True,create_dire
     :param create_directory: create missing directories
     """
     logger = logging.getLogger(__name__)
-    
-    src = assert_Path(src) # not flag exits because it could have a pattern
-    dst = assert_Path(dst) # not is dir because it might not exist if it s just being created
-    
+
+    src = assert_Path(src)  # not flag exits because it could have a pattern
+    dst = assert_Path(
+        dst
+    )  # not is dir because it might not exist if it s just being created
+
     for d in dst:
         for s in src:
             advanced_copy(s, d, excludes, includes, recursive)
-            
-    # treat case src is given as a pattern and does not really exist, 
+
+    # treat case src is given as a pattern and does not really exist,
     # convert it to an include
     if not src.is_dir() and not src.exists():
         if src.parent.is_dir():
-            includes = [src.name] # append ??
-            recursive=False
+            includes = [src.name]  # append ??
+            recursive = False
             src = src.parent
     if not src.exists():
-        e = NotExistingPathException('',src)
+        e = NotExistingPathException('', src)
         logger.error(e)
         return
 
@@ -147,15 +155,16 @@ def advanced_copy(src, dst, excludes=[], includes=[], recursive=True,create_dire
         cur = cur.joinpath(p)
         if not cur.exists():
             if not create_directory:
-                e= NotADirectoryException(_('Use create_directory option.'),cur)
+                e = NotADirectoryException(
+                    _('Use create_directory option.'), cur)
                 logger.exception(e)
                 raise e
-            logger.debug(_('creating directory ')+str(cur, enc))
+            logger.debug(_('creating directory ') + str(cur, enc))
             os.makedirs(str(cur.resolve()))
 
     if src.is_file():
-        logger.debug('_copy(%s,%s)'%(str(src),str(dst)))
+        logger.debug('_copy(%s,%s)' % (str(src), str(dst)))
         _copy(src, dst)
     else:
-        logger.debug('_copytree(%s,%s,...)'%(str(src),str(dst)))
+        logger.debug('_copytree(%s,%s,...)' % (str(src), str(dst)))
         _copytree(src, dst, excludes, includes, recursive)

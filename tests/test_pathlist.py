@@ -6,9 +6,10 @@ author: Cedric ROMAN
 email: roman@numengo.com
 licence: GNU GPLv3 """
 from __future__ import unicode_literals
-from builtins import str
-from builtins import object
+
 import logging
+from builtins import object
+from builtins import str
 from pathlib import Path
 
 import ngofile
@@ -32,6 +33,7 @@ class TestPathList(object):
         p2 = a.pick_first(test_file.name)
         assert p2.exists()
         assert not a.exists('dummy.dum')
+
 
 if __name__ == '__main__':
     pass

@@ -40,9 +40,15 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-from builtins import range
-from past.utils import old_div
+import signal
+import sys
+import time
+from array import array
 from builtins import object
+from builtins import range
+
+from past.utils import old_div
+
 __author__ = "Nilton Volpato"
 __authorEmail__ = "first-name dot last-name @ gmail.com"
 __date__ = "2006-05-07"
@@ -56,11 +62,6 @@ __version__ = "2.2"
 # 2005-12-03: v1.0 rewrite using widgets
 # 2005-06-02: v0.5 rewrite
 # 2004-??-??: v0.1 first version
-
-import signal
-import sys
-import time
-from array import array
 
 try:
     from fcntl import ioctl
