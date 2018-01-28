@@ -28,7 +28,6 @@
     <Compile Include="src\ngofile\S3\uploadS3.py" />
     <Compile Include="src\ngofile\S3\utils.py" />
     <Compile Include="src\ngofile\S3\__init__.py" />
-    <Compile Include="src\ngofile\_assert_path.py" />
     <Compile Include="src\ngofile\_copy.py" />
     <Compile Include="src\ngofile\_list_files.py" />
     <Compile Include="src\ngofile\_pathlist.py" />

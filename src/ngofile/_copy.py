@@ -15,8 +15,10 @@ import sys
 from builtins import range
 from builtins import str
 from pathlib import Path
+from future.utils import text_to_native_str
+from ngomodel import validators
+from ngomodel import take_arrays
 
-from ._assert_path import assert_Path
 from .exceptions import CopyException
 from .exceptions import NgoFileException
 from .exceptions import NotADirectoryException
@@ -26,6 +28,7 @@ enc = sys.stdout.encoding or "cp850"
 _ = gettext.gettext
 
 
+take_arrays(1)
 def _copy(src, dst):
     """ copy a file src to dst (directory).
     
@@ -37,6 +40,8 @@ def _copy(src, dst):
     :type dst: pathlib.Path
     """
     logger = logging.getLogger(__name__)
+    src = text_to_native_str(src)
+    dst = text_to_native_str(dst)
     if os.path.exists(dst) and os.path.isdir(dst):
         dst = os.path.join(dst, os.path.basename(src))
     if os.path.exists(dst):
@@ -50,7 +55,7 @@ def _copy(src, dst):
         logger.debug('copy ' + str(src, enc) + ' to ' + str(dst, enc))
         shutil.copy2(src, dst)
 
-
+take_arrays(1)
 def _copytree(src, dst, excludes=[], includes=[], recursive=True):
     """ copy a directory structure src to destination
     
@@ -67,6 +72,8 @@ def _copytree(src, dst, excludes=[], includes=[], recursive=True):
     logger = logging.getLogger(__name__)
     # make sure to convert string from ngopath
     # convert everything to ngopath and back to string
+    src = text_to_native_str(src)
+    dst = text_to_native_str(dst)
 
     incl = r'|'.join([fnmatch.translate(x) for x in includes])
     excl = r'|'.join([fnmatch.translate(x) for x in excludes]) or r'$.'
@@ -105,6 +112,7 @@ def _copytree(src, dst, excludes=[], includes=[], recursive=True):
         raise CopyException(errors)
 
 
+take_arrays(1)
 def advanced_copy(src,
                   dst,
                   excludes=[],
@@ -114,9 +122,9 @@ def advanced_copy(src,
     """ copy a directory structure src to destination
     
     :param src: source file or directory
-    :type src: pathlib.Path
+    :type src: ngomodel.Path
     :param dst: destination file or directory
-    :type dst: pathlib.Path
+    :type dst: ngomodel.Path
     :param excludes: list of patterns to exclude
     :type excludes: list
     :param includes: list of patterns to include
@@ -126,45 +134,37 @@ def advanced_copy(src,
     """
     logger = logging.getLogger(__name__)
 
-    src = assert_Path(src)  # not flag exits because it could have a pattern
-    dst = assert_Path(
-        dst
-    )  # not is dir because it might not exist if it s just being created
-
-    for d in dst:
-        for s in src:
-            advanced_copy(s, d, excludes, includes, recursive)
+    src = text_to_native_str(src)  # not Path because it could have a pattern
+    dsts = validators.TypedSet(validators.Path)(dst) # not is dir because it might not exist if it s just being created
+    includes = validators.TypedSet(text_to_native_str)(includes)
+    excludes = validators.TypedSet(text_to_native_str)(excludes)
 
     # treat case src is given as a pattern and does not really exist,
     # convert it to an include
-    if not src.is_dir() and not src.exists():
-        if src.parent.is_dir():
-            includes = [src.name]  # append ??
-            recursive = False
-            src = src.parent
-    if not src.exists():
-        e = NotExistingPathException('', src)
-        logger.error(e)
-        return
+    if '*' in src:
+        src = src.replace('\\','/')
+        bf, af = src.split('*',1)
+        src, inc = bf.rsplit('/',1)
+        inc = '%s*%s'%(inc,af)
+        includes.add(inc)
+    src = validators.ExistingPath(src)
 
-    # do we need to create dst directories ?
-    parts = dst.parts
-    cur = Path(parts[0])
-    assert cur.exists(), '%s does not exist' % str(cur, enc)
-    for p in parts[1:]:
-        cur = cur.joinpath(p)
-        if not cur.exists():
-            if not create_directory:
-                e = NotADirectoryException(
-                    _('Use create_directory option.'), cur)
-                logger.exception(e)
-                raise e
-            logger.debug(_('creating directory ') + str(cur, enc))
-            os.makedirs(str(cur.resolve()))
-
-    if src.is_file():
-        logger.debug('_copy(%s,%s)' % (str(src), str(dst)))
-        _copy(src, dst)
-    else:
-        logger.debug('_copytree(%s,%s,...)' % (str(src), str(dst)))
-        _copytree(src, dst, excludes, includes, recursive)
+    for dst in dsts:
+        # do we need to create dst directories ?
+        parts = dst.parts
+        cur = validators.Path(parts[0])
+        assert cur.exists(), '%s does not exist' % str(cur)
+        for p in parts[1:]:
+            cur = cur.joinpath(p)
+            if not cur.is_dir():
+                if not create_directory:
+                    raise NotADirectoryException(
+                        _('Use create_directory option.'), cur)
+                logger.debug(_('creating directory %s'%cur))
+                os.makedirs(text_to_native_str(cur.resolve()))
+        if src.is_file():
+            logger.debug('_copy(%s,%s)' % (str(src), str(dst)))
+            _copy(src, dst)
+        else:
+            logger.debug('_copytree(%s,%s,...)' % (str(src), str(dst)))
+            _copytree(src, dst, excludes, includes, recursive)

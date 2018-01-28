@@ -31,7 +31,8 @@ def get_version(package):
     """
     Return package version as listed in `__version__` in `init.py`.
     """
-    init_py = open(os.path.join('src',package, '__init__.py')).read()
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    init_py = open(os.path.join(dir_path,'src',package, '__init__.py')).read()
     return re.search("^__version__ = ['\"]([^'\"]+)['\"]",
                      init_py, re.MULTILINE).group(1)
 
@@ -93,7 +94,7 @@ setup(
         re.sub(':[a-z]+:`~?(.*?)`', r'``\1``', read('CHANGELOG.rst'))
     ),
     author=author,
-    authorEmail=authorEmail,
+    author_email=authorEmail,
     url=url,
     packages=find_packages('src'),
     package_dir={'': 'src'},
