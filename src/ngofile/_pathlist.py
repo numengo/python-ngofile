@@ -9,7 +9,10 @@ import logging
 from builtins import object
 from builtins import str
 import sys
+import pprint
+import operator
 import inspect
+import os.path
 import pathlib
 from future.utils import text_to_native_str
 
@@ -22,17 +25,17 @@ class PathList(object):
     """ path list manager """
     _initialized = False
     _instance = None
-    _pathlist = set()
+    _pathdict = {} # we store the pathlist as a dict to store last search results
 
     def __new__(cls, *args, **kwargs):
         singleton =  kwargs.get('singleton', True)
         if singleton:
             if not cls._instance:
                 cls._instance = super(PathList, cls).__new__(cls)
-                cls._instance._pathlist = set()
+                cls._instance._pathdict = {}
             return cls._instance
         else:
-            cls._pathlist = set()
+            cls._pathdict = {}
             return super(PathList, cls).__new__(cls)
 
     def __init__(self, *args, **kwargs):
@@ -45,28 +48,30 @@ class PathList(object):
         if 'pathlist' in kwargs:
             self.pathlist = kwargs.pop('pathlist')
 
+    def __str__(self):
+        return ("<%s>\n%s"%(self.__class__.__name__,pprint.pformat(list(self.pathlist))))
+
     def __repr__(self):
         '''Returns representation of the object'''
-        return ("{}[{}]('{}')".format(self.__class__.__name__,
-                                      len(self._pathlist), self._pathlist))
+        return ("<%s[%i items]>"%(self.__class__.__name__,len(self._pathdict)))
 
     @property
     def pathlist(self):
-        return self._pathlist
+        return set(self._pathdict.keys())
 
     @pathlist.setter
     def pathlist(self, pathlist):
         """ set the pathlist from a list
         :param pathlist: path list to set
         :rtype pathlist: list"""
-        self._pathlist.clear()
+        self._pathdict.clear()
         for p in pathlist:
             self.add(p)
 
     def as_strings(self):
         """ returns the pathlist as a set of string
         :rtype: set"""
-        return set([text_to_native_str(p) for p in self._pathlist])
+        return set([text_to_native_str(p) for p in self.pathlist])
 
     @take_arrays(1)
     def add(self, path):
@@ -82,7 +87,8 @@ class PathList(object):
         p = validators.Path(path)
         if not p in self.pathlist:
             if p.exists():
-                self._pathlist.add(p.resolve())
+                p = p.resolve()
+                self._pathdict[p] = 0 # intialize counter
             else:
                 self.logger.warning('%s does not exist' % p)
         else:
@@ -95,18 +101,32 @@ class PathList(object):
         :param path: path or pattern
         :type path: ngomodel.Path
         :rtype: bool"""
-        return len(self.list_files(path)) > 0
+        return bool(self.pick_first(path))
 
     @take_arrays(1)
     def pick_first(self, path):
-        """ picks the first existing match
+        """ pick the first existing match
 
         :param path: path or pattern
-        :type path: ngomodel.Path
-        :rtype: pathlib.Path/None """
-        ms = self.list_files(path)
-        if len(ms) > 0:
-            return ms[0]
+        :type path: str
+        :rtype: pathlib.Path """
+        path = text_to_native_str(path)
+        path = path.replace('\\','/')
+        includes = []
+        if '*' in path:
+            bf, af = path.split('*',1)
+            path, inc = bf.rsplit('/',1)
+            includes = [ '%s*%s'%(inc,af) ]
+        if os.path.exists(path):
+            return validators.Path(path)
+        optimized_pathlist = sorted(self._pathdict.items(),key=operator.itemgetter(1),reverse=True)
+        for p, _oldc in optimized_pathlist:
+            if p.joinpath(path).exists():
+                ls = list_files(p.joinpath(path),includes)
+                # we dont update the counter because all paths are not treated equally
+                #self._pathdict[p] = len(ls)
+                if ls:
+                    return ls[0]
 
     def list_files(self,
                    includes=["*"],
@@ -125,13 +145,16 @@ class PathList(object):
         :param flatten: flatten return lists
         :rtype: ngomodel.TypedList(pathlib.Path)
         """
-        ret = []
-        for p in self.pathlist:
+        ret = [None]*len(self._pathdict)
+        optimized_pathlist = sorted(self._pathdict.items(),key=operator.itemgetter(1),reverse=True)
+        for p, _oldc in optimized_pathlist:
             ls = list_files(p, includes, excludes, recursive, in_parents)
-            if flatten:
-                ret += ls
-            else:
-                ret.append(ls)
+            self._pathdict[p] = len(ls)
+            ret[list(self.pathlist).index(p)] = ls
+
+        if flatten:
+            return [item for sublist in ret for item in sublist]
+
         return ret
 
 class LoadedModules(PathList):

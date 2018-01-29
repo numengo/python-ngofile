@@ -13,11 +13,12 @@ import fnmatch
 import gettext
 import logging
 import os
+import os.path
+import pathlib 
 import re
 import zipfile
 from builtins import range
 from builtins import str
-from pathlib import Path
 from future.utils import text_to_native_str
 from ngomodel import validators
 from ngomodel import take_arrays
@@ -52,12 +53,16 @@ def list_files(src,
     """
     logger = logging.getLogger(__name__)
 
+    # declare includes regex and create a function to compile it
+    global inclp
     inclp = None
     def _compile_includes(includes):
         global inclp
         incl = r'|'.join([fnmatch.translate(x.lower()) for x in includes])
         inclp = re.compile(incl)
 
+    # declare excludes regex and create a function to compile it
+    global exclp
     exclp = None
     def _compile_excludes(excludes):
         global exclp
@@ -65,10 +70,16 @@ def list_files(src,
                           for x in excludes]) or r'$.'
         exclp = re.compile(excl)
 
+    global count
+    count = 0 # global counter
     # first we define a helper function for recursive operations
     def list_files_in_dir(srcdir, includes, excludes, recursive):
-        ret = []
+        """ we use strings and only create a path object if it s a resut """
         global inclp, exclp
+        global count
+        ret = []
+        count +=1
+        count2 = 0 # local counter
         for p in includes:
             includes2 = includes
             p2 = p.replace('\\', '/')
@@ -77,9 +88,10 @@ def list_files(src,
                 includes2.remove(p)
                 includes2.add(pb)
                 _compile_includes(includes2)
-                if srcdir.joinpath(pa).exists():
-                    ls = list_files_in_dir(
-                        srcdir.joinpath(pa), includes2, excludes, recursive)
+                pa = os.path.join(srcdir,pa)
+                if os.path.exists(pa):
+                    count2 += 1
+                    ls = list_files_in_dir(pa, includes2, excludes, recursive)
                     ret += ls
         for p in excludes:
             excludes2 = excludes
@@ -89,46 +101,29 @@ def list_files(src,
                 excludes2.remove(p)
                 excludes2.add(pb)
                 _compile_excludes(excludes2)
-                if srcdir.joinpath(pa).exists():
-                    ls = list_files_in_dir(
-                        srcdir.joinpath(pa), includes, excludes2, recursive)
+                pa = os.path.join(srcdir,pa)
+                if os.path.exists(pa):
+                    count2 += 1
+                    ls = list_files_in_dir(pa, includes, excludes2, recursive)
                     ret += ls
-        srcdir = validators.DirPath(srcdir)
-        incl = r'|'.join([fnmatch.translate(x.lower()) for x in includes])
-        excl = r'|'.join([fnmatch.translate(x.lower())
-                          for x in excludes]) or r'$.'
-
-        sd = text_to_native_str(srcdir)
-        try:
-            names_all = os.listdir(sd)
-        except Exception as er:
-            logger.exception(er)
-            return []
+        names_all = os.listdir(srcdir)
         names_not_excl = [
             name for name in names_all if not exclp.match(name.lower())
         ]
         for name in names_not_excl:
-            path = srcdir.joinpath(name)
-            if path.is_dir() and recursive:
-                ret = ret + list_files_in_dir(path, includes, excludes,
-                                              recursive)
-            elif inclp.match(name.lower()):
+            path = os.path.join(srcdir,name)
+            if os.path.isdir(path) and recursive:
+                ret += list_files_in_dir(path, includes, excludes, recursive)
+            if inclp.match(name.lower()):
                 if directories or path.is_dir():
-                    ret.append(path)
+                    ret.append(pathlib.Path(path))
         if ret:
-            logger.debug(_('found %i files in %s' % (len(ret),srcdir)))
+            logger.debug(_('found %i files in %s (and %i inner directories)' % (len(ret),srcdir,count2)))
+        else:
+            logger.debug(_('no files found in %s (and %i inner directories)' % (srcdir,count2)))
         return ret
 
-    if not isinstance(includes,list):
-        includes = [includes]
-    if not isinstance(excludes,list):
-        includes = [excludes]
-
-    src = text_to_native_str(src)  # not Path because it could have a pattern
-    # this creates a set of all includes/excludes in native string
-    includes = validators.TypedSet(text_to_native_str)(includes)
-    excludes = validators.TypedSet(text_to_native_str)(excludes)
-
+    src = text_to_native_str(src)
     # treat case src is given as a pattern and does not really exist,
     # convert it to an include
     if '*' in src:
@@ -137,26 +132,35 @@ def list_files(src,
         src, inc = bf.rsplit('/',1)
         inc = '%s*%s'%(inc,af)
         includes.add(inc)
-
-    srcdir = validators.Path(src)
-    if not srcdir.exists():
-        return []
+    if not os.path.exists(src):
+        raise IOError(_('impossible to list file in non existing directory %s'%src))
+    if not os.path.isdir(src): # it s a file, returns it
+        return [src]
 
     # to compile regexp only when they change
+    if not isinstance(includes,list):
+        includes = [includes]
+    if not isinstance(excludes,list):
+        includes = [excludes]
+    # this creates a set of all includes/excludes in native string
+    includes = validators.TypedSet(text_to_native_str)(includes)
+    excludes = validators.TypedSet(text_to_native_str)(excludes)
     _compile_includes(includes)
     _compile_excludes(excludes)
 
-    ret = list_files_in_dir(srcdir, includes, excludes, recursive)
-    logger.debug(_('found %i files in %s' % (len(ret),srcdir)))
+    ret = list_files_in_dir(src, includes, excludes, recursive)
+    logger.debug(_('found %i files in %s (and %i inner directories)' % (len(ret),src,count)))
 
     if in_parents:
+        srcdir = pathlib.Path(src)
         cur = srcdir.resolve()
         while cur.stem:
+            count = 0
             inpar = list_files_in_dir(
                 cur.parent, includes,
                 excludes + set([cur.relative_to(cur.parent)]), recursive)
             if inpar:
-                logger.debug(_('found %i files in parents in %s' % (len(inpar),cur.parent)))
+                logger.debug(_('found %i files in parents in %s (and %i inner directories)' % (len(inpar),cur.parent,count)))
             ret += inpar
             cur = cur.parent
     return ret
