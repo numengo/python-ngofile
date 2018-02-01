@@ -17,8 +17,6 @@ import pathlib
 from future.utils import text_to_native_str
 
 from ._list_files import list_files
-from ngomodel import validators
-from ngomodel import take_arrays
 
 
 class PathList(object):
@@ -73,18 +71,19 @@ class PathList(object):
         :rtype: set"""
         return set([text_to_native_str(p) for p in self.pathlist])
 
-    @take_arrays(1)
     def add(self, path):
         """ append a path to pathlist (only if it exists)
 
         :param path: path to assert
-        :type path: ngomodel.Path """
+        :type path:pathlib.Path """
+        if type(path) in [list,set,tuple]:
+            return [self.exists(p) for p in path]
         p = text_to_native_str(path)
         if '*' in p:
             # use list_files to create a list of files coressponding to pattern
             # and add the list pathlist
             self.add(list_files(p))
-        p = validators.Path(path)
+        p = pathlib.Path(path)
         if not p in self.pathlist:
             if p.exists():
                 p = p.resolve()
@@ -94,22 +93,26 @@ class PathList(object):
         else:
             self.logger.warning('%s already in pathlist' % p)
 
-    @take_arrays(1)
+
     def exists(self, path):
         """ check if a path exists in pathlist
 
         :param path: path or pattern
-        :type path: ngomodel.Path
+        :type path:pathlib.Path
         :rtype: bool"""
+        if type(path) in [list,set,tuple]:
+            return [self.exists(p) for p in path]
         return bool(self.pick_first(path))
 
-    @take_arrays(1)
+
     def pick_first(self, path):
         """ pick the first existing match
 
         :param path: path or pattern
         :type path: str
-        :rtype: pathlib.Path """
+        :rtype:pathlib.Path """
+        if type(path) in [list,set,tuple]:
+            return [self.pick_first(p) for p in path]
         path = text_to_native_str(path)
         path = path.replace('\\','/')
         includes = []
@@ -118,7 +121,7 @@ class PathList(object):
             path, inc = bf.rsplit('/',1)
             includes = [ '%s*%s'%(inc,af) ]
         if os.path.exists(path):
-            return validators.Path(path)
+            return pathlib.Path(path)
         optimized_pathlist = sorted(self._pathdict.items(),key=operator.itemgetter(1),reverse=True)
         for p, _oldc in optimized_pathlist:
             if p.joinpath(path).exists():

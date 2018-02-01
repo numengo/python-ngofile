@@ -20,8 +20,7 @@ import zipfile
 from builtins import range
 from builtins import str
 from future.utils import text_to_native_str
-from ngomodel import validators
-from ngomodel import take_arrays
+
 
 from .exceptions import NotADirectoryException
 from .exceptions import NotAZipArchiveException
@@ -29,7 +28,6 @@ from .exceptions import NotExistingPathException
 
 _ = gettext.gettext
 
-take_arrays(1)
 def list_files(src,
                includes=["*"],
                excludes=[],
@@ -41,7 +39,7 @@ def list_files(src,
     if src contains patterns, modifies initial source dir and create corresponding includes patterns
     
     :param srcdir: source directory
-    :type srcdir: str/pathlib.Path
+    :type srcdir: str
     :param includes: pattern or list of patterns ('*.py', '*.txt', etc...)
     :type includes: str/list
     :param excludes: pattern or patterns to exclude
@@ -49,9 +47,11 @@ def list_files(src,
     :param recursive:list files recursively
     :param in_parents: list files recursively in parents
     :param directories: list also directories
-    :rtype: ngomodel.TypedList(pathlib.Path)
+    :rtype: ngomodel.validators.TypedList(pathlib.Path)
     """
     logger = logging.getLogger(__name__)
+    if type(src) in [list,set,tuple]:
+        return [list_files(s,includes,excludes,recursive, in_parents, directories) for s in src]
 
     # declare includes regex and create a function to compile it
     global inclp
@@ -143,8 +143,8 @@ def list_files(src,
     if not isinstance(excludes,list):
         includes = [excludes]
     # this creates a set of all includes/excludes in native string
-    includes = validators.TypedSet(text_to_native_str)(includes)
-    excludes = validators.TypedSet(text_to_native_str)(excludes)
+    includes = set([text_to_native_str(i) for i in includes])
+    excludes = set([text_to_native_str(e) for e in excludes])
     _compile_includes(includes)
     _compile_excludes(excludes)
 
@@ -164,21 +164,6 @@ def list_files(src,
             ret += inpar
             cur = cur.parent
     return ret
-
-
-take_arrays(1)
-#def list_files_to_move(srcdir,dest,excludes=[],recursive=False):
-#    """ list files to move from a directory to another.
-#
-#    srcdir: source directory
-#    dest: destination directory
-#    excludes: list of patterns to exclude
-#    recursive: boolean
-#    """
-#    files = list_files(srcdir,excludes,recursive)
-#    d = Path(dest)
-#    return [(f, d.joinpath(f.relative_to(srcdir)) )
-#            for f in files]
 
 
 def list_files_in_zip(archive, includes=["*"], excludes=[], recursive=False, directories=True):

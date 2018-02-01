@@ -35,9 +35,9 @@ def _copy(src, dst):
     if dst exists and is the same, nothing is done
 
     :param src: source file or directory
-    :type src: pathlib.Path
+    :type src:pathlib.Path
     :param dst: destination file or directory
-    :type dst: pathlib.Path
+    :type dst:pathlib.Path
     """
     logger = logging.getLogger(__name__)
     src = text_to_native_str(src)
@@ -60,13 +60,13 @@ def _copytree(src, dst, excludes=[], includes=[], recursive=True):
     """ copy a directory structure src to destination
     
     :param src: source file or directory
-    :type src: pathlib.Path
+    :type src:pathlib.Path
     :param dst: destination file or directory
-    :type dst: pathlib.Path
+    :type dst:pathlib.Path
     :param excludes: list of patterns to exclude
-    :type excludes: list
+    :type excludes: ngomodel.validators.List
     :param includes: list of patterns to include
-    :type includes: list
+    :type includes: ngomodel.validators.List
     :param recursive: recursive copy
     """
     logger = logging.getLogger(__name__)
@@ -122,9 +122,9 @@ def advanced_copy(src,
     """ copy a directory structure src to destination
     
     :param src: source file or directory
-    :type src: ngomodel.Path
+    :type src:pathlib.Path
     :param dst: destination file or directory
-    :type dst: ngomodel.Path
+    :type dst:pathlib.Path
     :param excludes: list of patterns to exclude
     :type excludes: list
     :param includes: list of patterns to include
