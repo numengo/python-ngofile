@@ -81,30 +81,33 @@ def list_files(src,
         count +=1
         count2 = 0 # local counter
         for p in includes:
-            includes2 = includes
             p2 = p.replace('\\', '/')
             if '/' in p2:
+                includes2 = set(includes)
                 pa, pb = p2.split('/', 1)
                 includes2.remove(p)
                 includes2.add(pb)
-                _compile_includes(includes2)
                 pa = os.path.join(srcdir,pa)
                 if os.path.exists(pa):
                     count2 += 1
+                    _compile_includes(includes2)
                     ls = list_files_in_dir(pa, includes2, excludes, recursive)
+                    _compile_includes(includes)
                     ret += ls
+
         for p in excludes:
-            excludes2 = excludes
             p2 = p.replace('\\', '/')
             if '/' in p2:
-                pa, pb = p2.lsplit('/', 1)
+                excludes2 = set(excludes)
+                pa, pb = p2.split('/', 1)
                 excludes2.remove(p)
                 excludes2.add(pb)
-                _compile_excludes(excludes2)
                 pa = os.path.join(srcdir,pa)
                 if os.path.exists(pa):
                     count2 += 1
+                    _compile_excludes(excludes2)
                     ls = list_files_in_dir(pa, includes, excludes2, recursive)
+                    _compile_excludes(excludes)
                     ret += ls
         names_all = os.listdir(srcdir)
         names_not_excl = [

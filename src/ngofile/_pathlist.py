@@ -146,7 +146,7 @@ class PathList(object):
         :param recursive:list files recursively
         :param in_parents: list files recursively in parents
         :param flatten: flatten return lists
-        :rtype: ngomodel.TypedList(pathlib.Path)
+        :rtype: ngomodel.validators.TypedList(pathlib.Path)
         """
         ret = [None]*len(self._pathdict)
         optimized_pathlist = sorted(self._pathdict.items(),key=operator.itemgetter(1),reverse=True)
@@ -163,6 +163,7 @@ class PathList(object):
 class LoadedModules(PathList):
     """ special pathlist of loaded modules directories """
     def __init__(self):
+        PathList.__init__(self,singleton=True)
         if not self._initialized:
             self._initialized = True
             self.update()
