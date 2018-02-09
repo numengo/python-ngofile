@@ -86,7 +86,6 @@ class ProgressBarWidget(object):
         the update must be made.
 
         At least this function must be overriden."""
-        pass
 
 
 class ProgressBarWidgetHFill(object):
@@ -108,7 +107,6 @@ class ProgressBarWidgetHFill(object):
         horizontal width the widget must have.
 
         At least this function must be overriden."""
-        pass
 
 
 class ETA(ProgressBarWidget):
@@ -339,7 +337,7 @@ class ProgressBar(object):
 
 
 if __name__ == '__main__':
-    import os
+    pass
 
     def example1():
         widgets = [

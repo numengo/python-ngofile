@@ -14,13 +14,13 @@ import gettext
 import logging
 import os
 import os.path
-import pathlib 
+import pathlib
 import re
 import zipfile
 from builtins import range
 from builtins import str
-from future.utils import text_to_native_str
 
+from future.utils import text_to_native_str
 
 from .exceptions import NotADirectoryException
 from .exceptions import NotAZipArchiveException
@@ -28,34 +28,41 @@ from .exceptions import NotExistingPathException
 
 _ = gettext.gettext
 
+
 def list_files(src,
                includes=["*"],
                excludes=[],
                recursive=False,
                in_parents=False,
-               directories=True):
+               directories=True,
+               raise_src_exists=True):
     """ list files in a source path with a list of given patterns
 
     if src contains patterns, modifies initial source dir and create corresponding includes patterns
     
-    :param srcdir: source directory
-    :type srcdir: str
+    :param src: source directory
+    :type src: str
     :param includes: pattern or list of patterns ('*.py', '*.txt', etc...)
     :type includes: str/list
     :param excludes: pattern or patterns to exclude
     :type excludes: str/list
-    :param recursive:list files recursively
+    :param recursive: list files recursively
     :param in_parents: list files recursively in parents
     :param directories: list also directories
-    :rtype: ngomodel.validators.TypedList(pathlib.Path)
+    :param raise_src_exists: raise exception if src does not exist, or return empty list
+    :rtype: pathlib.Path
     """
     logger = logging.getLogger(__name__)
-    if type(src) in [list,set,tuple]:
-        return [list_files(s,includes,excludes,recursive, in_parents, directories) for s in src]
+    if type(src) in [list, set, tuple]:
+        return [
+            list_files(s, includes, excludes, recursive, in_parents,
+                       directories, raise_src_exists) for s in src
+        ]
 
     # declare includes regex and create a function to compile it
     global inclp
     inclp = None
+
     def _compile_includes(includes):
         global inclp
         incl = r'|'.join([fnmatch.translate(x.lower()) for x in includes])
@@ -64,6 +71,7 @@ def list_files(src,
     # declare excludes regex and create a function to compile it
     global exclp
     exclp = None
+
     def _compile_excludes(excludes):
         global exclp
         excl = r'|'.join([fnmatch.translate(x.lower())
@@ -71,15 +79,16 @@ def list_files(src,
         exclp = re.compile(excl)
 
     global count
-    count = 0 # global counter
+    count = 0  # global counter
+
     # first we define a helper function for recursive operations
     def list_files_in_dir(srcdir, includes, excludes, recursive):
         """ we use strings and only create a path object if it s a resut """
         global inclp, exclp
         global count
         ret = []
-        count +=1
-        count2 = 0 # local counter
+        count += 1
+        count2 = 0  # local counter
         for p in includes:
             p2 = p.replace('\\', '/')
             if '/' in p2:
@@ -87,7 +96,7 @@ def list_files(src,
                 pa, pb = p2.split('/', 1)
                 includes2.remove(p)
                 includes2.add(pb)
-                pa = os.path.join(srcdir,pa)
+                pa = os.path.join(srcdir, pa)
                 if os.path.exists(pa):
                     count2 += 1
                     _compile_includes(includes2)
@@ -102,7 +111,7 @@ def list_files(src,
                 pa, pb = p2.split('/', 1)
                 excludes2.remove(p)
                 excludes2.add(pb)
-                pa = os.path.join(srcdir,pa)
+                pa = os.path.join(srcdir, pa)
                 if os.path.exists(pa):
                     count2 += 1
                     _compile_excludes(excludes2)
@@ -114,36 +123,44 @@ def list_files(src,
             name for name in names_all if not exclp.match(name.lower())
         ]
         for name in names_not_excl:
-            path = os.path.join(srcdir,name)
+            path = os.path.join(srcdir, name)
             if os.path.isdir(path) and recursive:
                 ret += list_files_in_dir(path, includes, excludes, recursive)
             if inclp.match(name.lower()):
                 if directories or path.is_dir():
                     ret.append(pathlib.Path(path))
         if ret:
-            logger.debug(_('found %i files in %s (and %i inner directories)' % (len(ret),srcdir,count2)))
+            logger.debug(
+                _('found %i files in %s (and %i inner directories)' %
+                  (len(ret), srcdir, count2)))
         else:
-            logger.debug(_('no files found in %s (and %i inner directories)' % (srcdir,count2)))
+            logger.debug(
+                _('no files found in %s (and %i inner directories)' %
+                  (srcdir, count2)))
         return ret
 
     src = text_to_native_str(src)
     # treat case src is given as a pattern and does not really exist,
     # convert it to an include
     if '*' in src:
-        src = src.replace('\\','/')
-        bf, af = src.split('*',1)
-        src, inc = bf.rsplit('/',1)
-        inc = '%s*%s'%(inc,af)
+        src = src.replace('\\', '/')
+        bf, af = src.split('*', 1)
+        src, inc = bf.rsplit('/', 1)
+        inc = '%s*%s' % (inc, af)
         includes.add(inc)
     if not os.path.exists(src):
-        raise IOError(_('impossible to list file in non existing directory %s'%src))
-    if not os.path.isdir(src): # it s a file, returns it
+        if raise_src_exists:
+            raise IOError(
+                _('impossible to list file in non existing directory %s' %
+                  src))
+        return []
+    if not os.path.isdir(src):  # it s a file, returns it
         return [src]
 
     # to compile regexp only when they change
-    if not isinstance(includes,list):
+    if not isinstance(includes, list):
         includes = [includes]
-    if not isinstance(excludes,list):
+    if not isinstance(excludes, list):
         includes = [excludes]
     # this creates a set of all includes/excludes in native string
     includes = set([text_to_native_str(i) for i in includes])
@@ -152,7 +169,9 @@ def list_files(src,
     _compile_excludes(excludes)
 
     ret = list_files_in_dir(src, includes, excludes, recursive)
-    logger.debug(_('found %i files in %s (and %i inner directories)' % (len(ret),src,count)))
+    logger.debug(
+        _('found %i files in %s (and %i inner directories)' % (len(ret), src,
+                                                               count)))
 
     if in_parents:
         srcdir = pathlib.Path(src)
@@ -163,13 +182,19 @@ def list_files(src,
                 cur.parent, includes,
                 excludes + set([cur.relative_to(cur.parent)]), recursive)
             if inpar:
-                logger.debug(_('found %i files in parents in %s (and %i inner directories)' % (len(inpar),cur.parent,count)))
+                logger.debug(
+                    _('found %i files in parents in %s (and %i inner directories)'
+                      % (len(inpar), cur.parent, count)))
             ret += inpar
             cur = cur.parent
     return ret
 
 
-def list_files_in_zip(archive, includes=["*"], excludes=[], recursive=False, directories=True):
+def list_files_in_zip(archive,
+                      includes=["*"],
+                      excludes=[],
+                      recursive=False,
+                      directories=True):
     """ list files in a zip file
 
     :param archive: zipfile to explore

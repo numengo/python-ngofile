@@ -5,15 +5,16 @@ functions/class to deal with filepathes
 """
 from __future__ import unicode_literals
 
-import logging
-from builtins import object
-from builtins import str
-import sys
-import pprint
-import operator
 import inspect
+import logging
+import operator
 import os.path
 import pathlib
+import pprint
+import sys
+from builtins import object
+from builtins import str
+
 from future.utils import text_to_native_str
 
 from ._list_files import list_files
@@ -23,10 +24,11 @@ class PathList(object):
     """ path list manager """
     _initialized = False
     _instance = None
-    _pathdict = {} # we store the pathlist as a dict to store last search results
+    _pathdict = {
+    }  # we store the pathlist as a dict to store last search results
 
     def __new__(cls, *args, **kwargs):
-        singleton =  kwargs.get('singleton', True)
+        singleton = kwargs.get('singleton', True)
         if singleton:
             if not cls._instance:
                 cls._instance = super(PathList, cls).__new__(cls)
@@ -47,11 +49,13 @@ class PathList(object):
             self.pathlist = kwargs.pop('pathlist')
 
     def __str__(self):
-        return ("<%s>\n%s"%(self.__class__.__name__,pprint.pformat(list(self.pathlist))))
+        return ("<%s>\n%s" % (self.__class__.__name__,
+                              pprint.pformat(list(self.pathlist))))
 
     def __repr__(self):
         '''Returns representation of the object'''
-        return ("<%s[%i items]>"%(self.__class__.__name__,len(self._pathdict)))
+        return ("<%s[%i items]>" % (self.__class__.__name__,
+                                    len(self._pathdict)))
 
     @property
     def pathlist(self):
@@ -75,8 +79,8 @@ class PathList(object):
         """ append a path to pathlist (only if it exists)
 
         :param path: path to assert
-        :type path:pathlib.Path """
-        if type(path) in [list,set,tuple]:
+        :type path: pathlib.Path """
+        if type(path) in [list, set, tuple]:
             return [self.exists(p) for p in path]
         p = text_to_native_str(path)
         if '*' in p:
@@ -87,45 +91,46 @@ class PathList(object):
         if not p in self.pathlist:
             if p.exists():
                 p = p.resolve()
-                self._pathdict[p] = 0 # intialize counter
+                self._pathdict[p] = 0  # intialize counter
             else:
                 self.logger.warning('%s does not exist' % p)
         else:
             self.logger.warning('%s already in pathlist' % p)
 
-
     def exists(self, path):
         """ check if a path exists in pathlist
 
         :param path: path or pattern
-        :type path:pathlib.Path
+        :type path: pathlib.Path
         :rtype: bool"""
-        if type(path) in [list,set,tuple]:
+        if type(path) in [list, set, tuple]:
             return [self.exists(p) for p in path]
         return bool(self.pick_first(path))
-
 
     def pick_first(self, path):
         """ pick the first existing match
 
         :param path: path or pattern
         :type path: str
-        :rtype:pathlib.Path """
-        if type(path) in [list,set,tuple]:
+        :rtype: pathlib.Path """
+        if type(path) in [list, set, tuple]:
             return [self.pick_first(p) for p in path]
         path = text_to_native_str(path)
-        path = path.replace('\\','/')
+        path = path.replace('\\', '/')
         includes = []
         if '*' in path:
-            bf, af = path.split('*',1)
-            path, inc = bf.rsplit('/',1)
-            includes = [ '%s*%s'%(inc,af) ]
+            bf, af = path.split('*', 1)
+            path, inc = bf.rsplit('/', 1)
+            includes = ['%s*%s' % (inc, af)]
         if os.path.exists(path):
             return pathlib.Path(path)
-        optimized_pathlist = sorted(self._pathdict.items(),key=operator.itemgetter(1),reverse=True)
+        optimized_pathlist = sorted(
+            list(self._pathdict.items()),
+            key=operator.itemgetter(1),
+            reverse=True)
         for p, _oldc in optimized_pathlist:
             if p.joinpath(path).exists():
-                ls = list_files(p.joinpath(path),includes)
+                ls = list_files(p.joinpath(path), includes)
                 # we dont update the counter because all paths are not treated equally
                 #self._pathdict[p] = len(ls)
                 if ls:
@@ -148,8 +153,11 @@ class PathList(object):
         :param flatten: flatten return lists
         :rtype: ngomodel.validators.TypedList(pathlib.Path)
         """
-        ret = [None]*len(self._pathdict)
-        optimized_pathlist = sorted(self._pathdict.items(),key=operator.itemgetter(1),reverse=True)
+        ret = [None] * len(self._pathdict)
+        optimized_pathlist = sorted(
+            list(self._pathdict.items()),
+            key=operator.itemgetter(1),
+            reverse=True)
         for p, _oldc in optimized_pathlist:
             ls = list_files(p, includes, excludes, recursive, in_parents)
             self._pathdict[p] = len(ls)
@@ -160,10 +168,12 @@ class PathList(object):
 
         return ret
 
+
 class LoadedModules(PathList):
     """ special pathlist of loaded modules directories """
+
     def __init__(self):
-        PathList.__init__(self,singleton=True)
+        PathList.__init__(self, singleton=True)
         if not self._initialized:
             self._initialized = True
             self.update()
@@ -192,14 +202,16 @@ class LoadedModules(PathList):
                    in_parents=False,
                    flatten=True):
         """ overloaded method to reload pathlist if no result found """
-        ret = PathList.list_files(self,includes,excludes,recursive,in_parents)
+        ret = PathList.list_files(self, includes, excludes, recursive,
+                                  in_parents)
         if not ret:
             s1 = self.pathlist
             s2 = self._get_current_pathset()
             df = s2.difference(s1)
             if df:
                 self.update()
-                return PathList.list_files(self,includes,excludes,recursive,in_parents)
+                return PathList.list_files(self, includes, excludes, recursive,
+                                           in_parents)
         return ret
 
 

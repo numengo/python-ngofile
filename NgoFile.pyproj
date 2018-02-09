@@ -33,11 +33,13 @@
     <Compile Include="src\ngofile\_pathlist.py" />
     <Compile Include="src\ngofile\__init__.py" />
     <Compile Include="src\ngofile\__main__.py" />
+    <Compile Include="tests\run-tests.py" />
     <Compile Include="tests\test_list_files.py" />
     <Compile Include="tests\test_ngofile_cli.py" />
     <Compile Include="tests\test_pathlist.py" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="src\" />
     <Folder Include="src\ngofile\S3" />
     <Folder Include="tests" />
     <Folder Include="src\ngofile" />
@@ -46,8 +48,8 @@
     <Interpreter Include="D:\Code\python-ngofile\.tox\3.4\">
       <Id>NgoFile_3.4</Id>
       <Description>NgoFile Python 3.4 32bit</Description>
-      <InterpreterPath>D:\Code\python-ngofile\.tox\3.4</InterpreterPath>
-      <WindowsInterpreterPath>D:\Code\python-ngofile\.tox\pythonw.exe</WindowsInterpreterPath>
+      <InterpreterPath>D:\Code\python-ngofile\.tox\3.4\Scripts\python.exe</InterpreterPath>
+      <WindowsInterpreterPath>D:\Code\python-ngofile\.tox\3.4\Scripts\pythonw.exe</WindowsInterpreterPath>
       <Version>3.4</Version>
       <Architecture>32bit</Architecture>
       <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
@@ -55,8 +57,8 @@
     <Interpreter Include="D:\Code\python-ngofile\.tox\2.7\">
       <Id>NgoFile_2.7</Id>
       <Description>NgoFile Python 2.7 32bit</Description>
-      <InterpreterPath>D:\Code\python-ngofile\.tox\2.7</InterpreterPath>
-      <WindowsInterpreterPath>D:\Code\python-ngofile\.tox\pythonw.exe</WindowsInterpreterPath>
+      <InterpreterPath>D:\Code\python-ngofile\.tox\2.7\Scripts\python.exe</InterpreterPath>
+      <WindowsInterpreterPath>D:\Code\python-ngofile\.tox\2.7\Scripts\pythonw.exe</WindowsInterpreterPath>
       <Version>2.7</Version>
       <Architecture>32bit</Architecture>
       <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>

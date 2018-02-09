@@ -7,7 +7,6 @@ from __future__ import unicode_literals
 
 import logging
 import optparse
-import os
 import sys
 import time
 

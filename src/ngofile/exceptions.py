@@ -7,7 +7,6 @@ All exceptions used in the ngofile code base are defined here.
 from __future__ import unicode_literals
 
 import gettext
-import sys
 from builtins import str
 
 _ = gettext.gettext

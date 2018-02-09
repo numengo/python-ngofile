@@ -15,9 +15,10 @@ import sys
 from builtins import range
 from builtins import str
 from pathlib import Path
+
 from future.utils import text_to_native_str
-from ngomodel import validators
 from ngomodel import take_arrays
+from ngomodel import validators
 
 from .exceptions import CopyException
 from .exceptions import NgoFileException
@@ -27,8 +28,9 @@ from .exceptions import NotExistingPathException
 enc = sys.stdout.encoding or "cp850"
 _ = gettext.gettext
 
-
 take_arrays(1)
+
+
 def _copy(src, dst):
     """ copy a file src to dst (directory).
     
@@ -55,7 +57,10 @@ def _copy(src, dst):
         logger.debug('copy ' + str(src, enc) + ' to ' + str(dst, enc))
         shutil.copy2(src, dst)
 
+
 take_arrays(1)
+
+
 def _copytree(src, dst, excludes=[], includes=[], recursive=True):
     """ copy a directory structure src to destination
     
@@ -102,7 +107,6 @@ def _copytree(src, dst, excludes=[], includes=[], recursive=True):
             errors.append((srcname, dstname, str(why)))
     try:
         shutil.copystat(src, dst)
-        pass
     except WindowsError:
         # can't copy file access times on Windows
         pass
@@ -113,6 +117,8 @@ def _copytree(src, dst, excludes=[], includes=[], recursive=True):
 
 
 take_arrays(1)
+
+
 def advanced_copy(src,
                   dst,
                   excludes=[],
@@ -135,17 +141,19 @@ def advanced_copy(src,
     logger = logging.getLogger(__name__)
 
     src = text_to_native_str(src)  # not Path because it could have a pattern
-    dsts = validators.TypedSet(validators.Path)(dst) # not is dir because it might not exist if it s just being created
+    dsts = validators.TypedSet(validators.Path)(
+        dst
+    )  # not is dir because it might not exist if it s just being created
     includes = validators.TypedSet(text_to_native_str)(includes)
     excludes = validators.TypedSet(text_to_native_str)(excludes)
 
     # treat case src is given as a pattern and does not really exist,
     # convert it to an include
     if '*' in src:
-        src = src.replace('\\','/')
-        bf, af = src.split('*',1)
-        src, inc = bf.rsplit('/',1)
-        inc = '%s*%s'%(inc,af)
+        src = src.replace('\\', '/')
+        bf, af = src.split('*', 1)
+        src, inc = bf.rsplit('/', 1)
+        inc = '%s*%s' % (inc, af)
         includes.add(inc)
     src = validators.ExistingPath(src)
 
@@ -160,7 +168,7 @@ def advanced_copy(src,
                 if not create_directory:
                     raise NotADirectoryException(
                         _('Use create_directory option.'), cur)
-                logger.debug(_('creating directory %s'%cur))
+                logger.debug(_('creating directory %s' % cur))
                 os.makedirs(text_to_native_str(cur.resolve()))
         if src.is_file():
             logger.debug('_copy(%s,%s)' % (str(src), str(dst)))
