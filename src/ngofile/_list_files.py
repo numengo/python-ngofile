@@ -34,7 +34,7 @@ def list_files(src,
                excludes=[],
                recursive=False,
                in_parents=False,
-               directories=True,
+               folders=1,
                raise_src_exists=True):
     """ list files in a source path with a list of given patterns
 
@@ -48,7 +48,8 @@ def list_files(src,
     :type excludes: str/list
     :param recursive: list files recursively
     :param in_parents: list files recursively in parents
-    :param directories: list also directories
+    :param folders: 0: without folders, 1: with folders, 2: only folders
+    :type folders: [0,1,2]
     :param raise_src_exists: raise exception if src does not exist, or return empty list
     :rtype: pathlib.Path
     """
@@ -56,7 +57,7 @@ def list_files(src,
     if type(src) in [list, set, tuple]:
         return [
             list_files(s, includes, excludes, recursive, in_parents,
-                       directories, raise_src_exists) for s in src
+                       folders, raise_src_exists) for s in src
         ]
 
     # declare includes regex and create a function to compile it
@@ -124,17 +125,20 @@ def list_files(src,
         ]
         for name in names_not_excl:
             path = os.path.join(srcdir, name)
+            is_dir = os.path.isdir(path)
             if os.path.isdir(path) and recursive:
                 ret += list_files_in_dir(path, includes, excludes, recursive)
             if inclp.match(name.lower()):
-                if directories or path.is_dir():
+                if ( (folders==0 and not is_dir)
+                  or (folders==1)
+                  or (folders==2 and is_dir)):
                     ret.append(pathlib.Path(path))
         if ret:
-            logger.debug(
+            logger.info(
                 _('found %i files in %s (and %i inner directories)' %
                   (len(ret), srcdir, count2)))
         else:
-            logger.debug(
+            logger.info(
                 _('no files found in %s (and %i inner directories)' %
                   (srcdir, count2)))
         return ret
@@ -161,7 +165,7 @@ def list_files(src,
     if not isinstance(includes, list):
         includes = [includes]
     if not isinstance(excludes, list):
-        includes = [excludes]
+        excludes = [excludes]
     # this creates a set of all includes/excludes in native string
     includes = set([text_to_native_str(i) for i in includes])
     excludes = set([text_to_native_str(e) for e in excludes])
@@ -178,9 +182,10 @@ def list_files(src,
         cur = srcdir.resolve()
         while cur.stem:
             count = 0
+            excludes2 = excludes.union(set([cur.relative_to(cur.parent)]))
+            excludes2 = set([text_to_native_str(e) for e in excludes2])
             inpar = list_files_in_dir(
-                cur.parent, includes,
-                excludes + set([cur.relative_to(cur.parent)]), recursive)
+                str(cur.parent), includes, excludes2, recursive)
             if inpar:
                 logger.debug(
                     _('found %i files in parents in %s (and %i inner directories)'

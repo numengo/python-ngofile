@@ -94,8 +94,6 @@ class PathList(object):
                 self._pathdict[p] = 0  # intialize counter
             else:
                 self.logger.warning('%s does not exist' % p)
-        else:
-            self.logger.warning('%s already in pathlist' % p)
 
     def exists(self, path):
         """ check if a path exists in pathlist
