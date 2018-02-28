@@ -6,6 +6,7 @@ import io
 import os.path
 import re
 import sys
+import subprocess
 from glob import glob
 
 from setuptools import find_packages
@@ -14,9 +15,9 @@ from setuptools import setup
 name = 'ngofile'
 package = 'ngofile'
 description = 'misc file utilities'
-url='https://github.com/numengo/python-ngofile'
+url = 'https://github.com/numengo/python-ngofile2'
 author = 'Cédric ROMAN'
-authorEmail = 'roman@numengo.com'
+author_email = 'roman@numengo.com'
 license = 'GNU General Public License v3'
 
 
@@ -32,9 +33,10 @@ def get_version(package):
     Return package version as listed in `__version__` in `init.py`.
     """
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    init_py = open(os.path.join(dir_path,'src',package, '__init__.py')).read()
+    init_py = open(os.path.join(dir_path, 'src', package, '__init__.py')).read()
     return re.search("^__version__ = ['\"]([^'\"]+)['\"]",
                      init_py, re.MULTILINE).group(1)
+
 
 version = get_version(package)
 
@@ -71,10 +73,16 @@ setup_requires=[
 install_requires=[
     'pathlib',
     'apipkg',
+    'future',
     'python-gettext',
     'click',
     'boto',  
 ]
+
+cmd = ['pip','install'] + [i for i in install_requires if '-' in i]
+print(' '.join(cmd))
+subprocess.check_call(cmd)
+install_requires = [i for i in install_requires if not '-' in i]
 
 test_requires=[
     'pytest',
@@ -94,7 +102,7 @@ setup(
         re.sub(':[a-z]+:`~?(.*?)`', r'``\1``', read('CHANGELOG.rst'))
     ),
     author=author,
-    author_email=authorEmail,
+    author_email=author_email,
     url=url,
     packages=find_packages('src'),
     package_dir={'': 'src'},
@@ -102,16 +110,19 @@ setup(
     py_modules=[os.path.splitext(os.path.basename(p))[0] for p in glob('src/*.py')],
     include_package_data=True,
     zip_safe=False,    
-    keywords= ["utilities"], 
+    keywords=["utilities"], 
     # python_requires=">=2.7,!=2.7.*,!=3.4.*,!=3.5.*,!=3.6.*,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,",
     setup_requires=setup_requires,
     install_requires=install_requires,
+    requires = install_requires,
     tests_require=test_requires,
     extras_require=extras_requires,
     entry_points={
         'console_scripts': [
+
             'advanced_copy=ngofile.cli:advanced_copy_cli',
-            'list_files=ngofile.cli:list_files_cli'
+
+            'list_files=ngofile.cli:list_files_cli',
         ]
     },
     classifiers=[

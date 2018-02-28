@@ -68,6 +68,8 @@ htmlcov
 .idea
 *.iml
 *.komodoproject
+*.pyproj
+*.sln
 
 # Complexity
 output/*.html

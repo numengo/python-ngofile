@@ -52,14 +52,6 @@ def test_list_files_in_zip():
     z.close()
 
 
-def test_list_files_with_included_dir():
-    src = r'D:\code\python-ngofile'
-    excludes = ['docs', '.*', 'dist', 'build']
-    includes = ['*.json', '*.yaml', '*.rst', '*.mtm', 'templates/*']
-    from pprint import pprint
-    ls = ngofile.list_files(src, includes, excludes)
-    pprint(ls)
-
 
 if __name__ == '__main__':
-    test_list_files2()
+    test_list_files_with_patterns()

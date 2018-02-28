@@ -88,7 +88,7 @@ class PathList(object):
             # and add the list pathlist
             self.add(list_files(p))
         p = pathlib.Path(path)
-        if not p in self.pathlist:
+        if p not in self.pathlist:
             if p.exists():
                 p = p.resolve()
                 self._pathdict[p] = 0  # intialize counter
@@ -178,11 +178,8 @@ class LoadedModules(PathList):
 
     def _get_current_pathset(self):
         """ method to create set of path of currently loaded modules """
-        ms = {
-            k: m
-            for k, m in list(sys.modules.items()) if m and inspect.ismodule(m)
-            and not inspect.isbuiltin(m) and not k.startswith('_')
-        }
+        ms = { k: m for k, m in list(sys.modules.items())
+              if m and inspect.ismodule(m) and not inspect.isbuiltin(m) and not k.startswith('_')}
         ps = set([
             pathlib.Path(m.__file__).parent for m in list(ms.values())
             if getattr(m, '__file__', None)

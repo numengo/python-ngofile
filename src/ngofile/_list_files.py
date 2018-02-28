@@ -42,7 +42,7 @@ def list_files(src,
     
     :param src: source directory
     :type src: str
-    :param includes: pattern or list of patterns ('*.py', '*.txt', etc...)
+    :param includes: pattern or list of patterns (*.py, *.txt, etc...)
     :type includes: str/list
     :param excludes: pattern or patterns to exclude
     :type excludes: str/list
@@ -56,8 +56,8 @@ def list_files(src,
     logger = logging.getLogger(__name__)
     if type(src) in [list, set, tuple]:
         return [
-            list_files(s, includes, excludes, recursive, in_parents,
-                       folders, raise_src_exists) for s in src
+            list_files(s, includes, excludes, recursive, in_parents, folders,
+                       raise_src_exists) for s in src
         ]
 
     # declare includes regex and create a function to compile it
@@ -129,9 +129,8 @@ def list_files(src,
             if os.path.isdir(path) and recursive:
                 ret += list_files_in_dir(path, includes, excludes, recursive)
             if inclp.match(name.lower()):
-                if ( (folders==0 and not is_dir)
-                  or (folders==1)
-                  or (folders==2 and is_dir)):
+                if ((folders == 0 and not is_dir) or (folders == 1)
+                        or (folders == 2 and is_dir)):
                     ret.append(pathlib.Path(path))
         if ret:
             logger.info(
