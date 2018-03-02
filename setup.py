@@ -79,8 +79,7 @@ install_requires=[
     'boto',  
 ]
 
-cmd = ['pip','install'] + [i for i in install_requires if '-' in i]
-print(' '.join(cmd))
+cmd = ['pip','install', '-q'] + [i for i in install_requires if '-' in i]
 subprocess.check_call(cmd)
 install_requires = [i for i in install_requires if not '-' in i]
 
