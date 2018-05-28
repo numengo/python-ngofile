@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-""" Unit tests for ngofile
+"""
+Unit tests for ngofile
 
 setup.py - created on 2017/11/15 08:44:32
 author: Cedric ROMAN
@@ -24,7 +25,7 @@ class TestPathList(object):
     def test_singleton(self):
         a = ngofile.PathList(test_dir)
         b = ngofile.PathList()
-        b.append(str(
+        b.add(str(
             test_dir))  # test_dir is already added during initialisation of a
         assert len(a.pathlist) == 1
 
@@ -36,6 +37,5 @@ class TestPathList(object):
 
 
 if __name__ == '__main__':
-    pass
-    # TestPathList.test_singleton()
-    # TestPathList.test_exists()
+    TestPathList().test_singleton()
+    TestPathList().test_exists()

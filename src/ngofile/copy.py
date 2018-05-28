@@ -1,5 +1,6 @@
 # coding: utf-8
-""" misc copy utilities
+""" 
+Misc copy utilities
 """
 from __future__ import unicode_literals
 
@@ -17,8 +18,6 @@ from builtins import str
 from pathlib import Path
 
 from future.utils import text_to_native_str
-from ngomodel import take_arrays
-from ngomodel import validators
 
 from .exceptions import CopyException
 from .exceptions import NgoFileException
@@ -28,13 +27,12 @@ from .exceptions import NotExistingPathException
 enc = sys.stdout.encoding or "cp850"
 _ = gettext.gettext
 
-take_arrays(1)
-
 
 def _copy(src, dst):
-    """ copy a file src to dst (directory).
+    """
+    Copy a file src to dst (directory).
     
-    if dst exists and is the same, nothing is done
+    If dst exists and is the same, nothing is done
 
     :param src: source file or directory
     :type src:pathlib.Path
@@ -58,16 +56,14 @@ def _copy(src, dst):
         shutil.copy2(src, dst)
 
 
-take_arrays(1)
-
-
 def _copytree(src, dst, excludes=[], includes=[], recursive=True):
-    """ copy a directory structure src to destination
+    """ 
+    Copy a directory structure src to destination
     
     :param src: source file or directory
-    :type src:pathlib.Path
+    :type src: path
     :param dst: destination file or directory
-    :type dst:pathlib.Path
+    :type dst: path
     :param excludes: list of patterns to exclude
     :type excludes: ngomodel.validators.List
     :param includes: list of patterns to include
@@ -116,21 +112,19 @@ def _copytree(src, dst, excludes=[], includes=[], recursive=True):
         raise CopyException(errors)
 
 
-take_arrays(1)
-
-
 def advanced_copy(src,
                   dst,
                   excludes=[],
                   includes=[],
                   recursive=True,
                   create_directory=True):
-    """ copy a directory structure src to destination
+    """
+    Copy a directory structure src to destination
     
     :param src: source file or directory
-    :type src:pathlib.Path
+    :type src: path
     :param dst: destination file or directory
-    :type dst:pathlib.Path
+    :type dst: path
     :param excludes: list of patterns to exclude
     :type excludes: list
     :param includes: list of patterns to include

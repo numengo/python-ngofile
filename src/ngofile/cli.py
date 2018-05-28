@@ -3,8 +3,8 @@
 import click
 import gettext
 
-from ngofile._list_files import list_files
-from ngofile._copy import advanced_copy
+from ngofile.list_files import list_files
+from ngofile.copy import advanced_copy
 
 _ = gettext.gettext
 

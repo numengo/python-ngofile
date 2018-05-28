@@ -24,23 +24,22 @@ test_dir_a = test_dir.joinpath('a')
 
 def test_list_files_with_patterns():
     # works with Path object
-    fs1 = ngofile.list_files(test_dir_a, recursive=True)
+    fs1 = list(ngofile.list_files(test_dir_a, recursive=True))
     # works with path as a string
-    fs2 = ngofile.list_files(str(test_dir_a), recursive=True)
+    fs2 = list(ngofile.list_files(str(test_dir_a), recursive=True))
     assert len(fs1) == len(fs2)
     # only selects *.py files
-    fs = ngofile.list_files(test_dir_a, "*.data", recursive=True)
+    fs = list(ngofile.list_files(test_dir_a, "*.data", recursive=True))
     assert len(fs) == 9
     # only selects *.py and *.txt files
-    fs = ngofile.list_files(test_dir_a, ["*.data", "*.txt"], recursive=True)
+    fs = list(ngofile.list_files(test_dir_a, ["*.data", "*.txt"], recursive=True))
     assert len(fs) == 18
     # only selects *.py files, but excludes b and bb directories
-    fs = ngofile.list_files(
-        test_dir_a, "*.data", ["bb", "bbb"], recursive=True)
+    fs = list(ngofile.list_files(
+        test_dir_a, "*.data", ["bb", "bbb"], recursive=True))
     assert len(fs) == 4
 
-    with pytest.raises(ngofile.exceptions.NotADirectoryException):
-        fs = ngofile.list_files(test_file)
+    assert str(test_file) == str(ngofile.list_files(test_file).next())
 
 
 def test_list_files_in_zip():
