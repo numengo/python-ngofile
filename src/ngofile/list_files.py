@@ -50,7 +50,7 @@ def list_files(src,
     :param folders: 0: without folders, 1: with folders, 2: only folders
     :type folders: [0,1,2]
     :param raise_src_exists: raise exception if src does not exist, or return empty list
-    :rtype: pathlib.Path
+    :rtype: path
     """
     logger = logging.getLogger(__name__)
     if type(src) in [list, set, tuple]:
@@ -133,7 +133,7 @@ def list_files(src,
             if os.path.isdir(path) and recursive:
                 for f in list_files_in_dir(path, includes, excludes, recursive):
                     lf_count += 1
-                    yield f
+                    yield pathlib.Path(f)
             if inclp.match(name.lower()):
                 if ((folders == 0 and not is_dir) or (folders == 1)
                         or (folders == 2 and is_dir)):
@@ -161,7 +161,7 @@ def list_files(src,
                   src))
         return
     if not os.path.isdir(src):  # it s a file, returns it
-        yield src
+        yield pathlib.Path(src)
         return
 
     # to compile regexp only when they change
@@ -177,7 +177,7 @@ def list_files(src,
 
     for f in list_files_in_dir(src, includes, excludes, recursive):
         f_count += 1
-        yield f
+        yield pathlib.Path(f)
 
     logger.info(
         _('found %i files in %s (and %i inner directories)' %
@@ -194,7 +194,7 @@ def list_files(src,
             for f in ist_files_in_dir(
                 str(cur.parent), includes, excludes2, recursive):
                 f_count += 1
-                yield f
+                yield pathlib.Path(f)
             if f_count:
                 logger.info(
                     _('found %i files in parents in %s (and %i inner directories)'

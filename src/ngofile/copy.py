@@ -35,9 +35,9 @@ def _copy(src, dst):
     If dst exists and is the same, nothing is done
 
     :param src: source file or directory
-    :type src:pathlib.Path
+    :type src: path
     :param dst: destination file or directory
-    :type dst:pathlib.Path
+    :type dst: path
     """
     logger = logging.getLogger(__name__)
     src = text_to_native_str(src)
