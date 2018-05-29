@@ -6,4 +6,4 @@ from . import _apipkg
 
 __author__ = """Cédric ROMAN"""
 __email__ = 'roman@numengo.com'
-__version__ = '0.1.0'
+__version__ = '0.1.1'
