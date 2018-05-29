@@ -198,7 +198,7 @@ class LoadedModules(PathList):
     """
 
     def __init__(self):
-        PathList.__init__(self, singleton=True)
+        PathList.__init__(self)
         if not self._initialized:
             self._initialized = True
             self.update()
@@ -248,6 +248,16 @@ class LoadedModules(PathList):
                 #                           in_parents,flatten)
 
 
-def list_in_modules(template):
-    for f in LoadedModules().list_files(template):
+def list_in_modules(includes=["*"],
+                   excludes=[],
+                   recursive=False):
+    """
+    :param includes: pattern or list of patterns ('*.py', '*.txt', etc...)
+    :type includes: [str/list]
+    :param excludes: patterns to exclude
+    :type excludes: [str/list]
+    :param recursive:list files recursively
+    :rtype: array, items:{type: path}
+    """
+    for f in LoadedModules().list_files(includes, excludes, recursive):
         yield f
