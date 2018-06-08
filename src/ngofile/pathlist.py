@@ -10,6 +10,7 @@ import operator
 import os.path
 import pathlib
 import pprint
+import importlib
 import sys
 from builtins import object
 from builtins import str
@@ -69,8 +70,7 @@ class PathList(object):
         """
         Set the pathlist from a list
 
-        :param pathlist: path list to set
-        :rtype pathlist: list
+        :type pathlist: list
         """
         self._pathdict.clear()
         for p in pathlist:
@@ -80,9 +80,9 @@ class PathList(object):
         """
         Return the pathlist as a set of string
 
-        :rtype: set
+        :rtype: list, items:{type:str}
         """
-        return set([text_to_native_str(p) for p in self.pathlist])
+        return [text_to_native_str(p) for p in self.pathlist]
 
     def add(self, path):
         """
@@ -105,6 +105,16 @@ class PathList(object):
                 self._pathdict[p] = 0  # intialize counter
             else:
                 self.logger.warning('%s does not exist' % p)
+
+    def add_module_path(self, module, *args):
+        """
+        Append a module path to pathlist
+
+        :param module: module name
+        :type module: string
+        """
+        m = importlib.import_module(module)
+        self.add(pathlib.Path(m.__file__).dirname.joinpath(args))
 
     def exists(self, path):
         """
@@ -144,11 +154,6 @@ class PathList(object):
         for p, _oldc in optimized_pathlist:
             if p.joinpath(path).exists():
                 return next(list_files(p.joinpath(path), includes))
-                #ls = list_files(p.joinpath(path), includes)
-                ## we dont update the counter because all paths are not treated equally
-                ##self._pathdict[p] = len(ls)
-                #if ls:
-                #    return ls[0]
 
     def list_files(self,
                    includes=["*"],
@@ -160,9 +165,9 @@ class PathList(object):
         List files in a source directory with a list of given patterns 
         
         :param includes: pattern or list of patterns ('*.py', '*.txt', etc...)
-        :type includes: [str/list]
+        :type includes: [str,list]
         :param excludes: patterns to exclude
-        :type excludes: [str/list]
+        :type excludes: [str,list]
         :param recursive:list files recursively
         :param in_parents: list files recursively in parents
         :param flatten: flatten return lists
@@ -180,84 +185,4 @@ class PathList(object):
                     yield f
             else:
                 yield list(lf)
-                
-        #for p, _oldc in optimized_pathlist:
-        #    ls = list(list_files(p, includes, excludes, recursive, in_parents))
-        #    self._pathdict[p] = len(ls)
-        #    ret[list(self.pathlist).index(p)] = ls
-        #
-        #if flatten:
-        #    return [item for sublist in ret for item in sublist]
-        #
-        #return ret
-
-
-class LoadedModules(PathList):
-    """
-    Special pathlist of loaded modules directories
-    """
-
-    def __init__(self):
-        PathList.__init__(self)
-        if not self._initialized:
-            self._initialized = True
-            self.update()
-
-    def _get_current_pathset(self):
-        """
-        Create set of path of currently loaded modules.
-        """
-        ms = { k: m for k, m in list(sys.modules.items())
-              if m and inspect.ismodule(m) and not inspect.isbuiltin(m) and not k.startswith('_')}
-        ps = set([
-            pathlib.Path(m.__file__).parent for m in list(ms.values())
-            if getattr(m, '__file__', None)
-        ])
-        return ps
-
-    def update(self):
-        """
-        Update pathlist from loaded modules
-        """
-        self.pathlist = self._get_current_pathset()
-
-    def list_files(self,
-                   includes=["*"],
-                   excludes=[],
-                   recursive=False,
-                   in_parents=False,
-                   flatten=True):
-        """
-        Overloaded method to reload pathlist if no result found
-        """
-        empty = True
-        for f in PathList.list_files(self, includes, excludes, recursive,
-                                     in_parents,flatten):
-            empty = False
-            yield f
-
-        if empty:
-            s1 = self.pathlist
-            s2 = self._get_current_pathset()
-            df = s2.difference(s1)
-            if df:
-                self.update()
-                for f in self.list_files(includes,excludes,recursive,in_parents,flatten):
-                    yield f
-                #return PathList.list_files(self, includes, excludes, recursive,
-                #                           in_parents,flatten)
-
-
-def list_in_modules(includes=["*"],
-                   excludes=[],
-                   recursive=False):
-    """
-    :param includes: pattern or list of patterns ('*.py', '*.txt', etc...)
-    :type includes: [str/list]
-    :param excludes: patterns to exclude
-    :type excludes: [str/list]
-    :param recursive:list files recursively
-    :rtype: array, items:{type: path}
-    """
-    for f in LoadedModules().list_files(includes, excludes, recursive):
-        yield f
+ 

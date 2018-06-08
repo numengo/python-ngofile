@@ -32,10 +32,10 @@ def get_version(package):
     """
     Return package version as listed in `__version__` in `init.py`.
     """
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    init_py = open(os.path.join(dir_path, 'src', package, '__init__.py')).read()
-    return re.search("^__version__ = ['\"]([^'\"]+)['\"]",
-                     init_py, re.MULTILINE).group(1)
+    dir_path = dirname(os.path.realpath(__file__))
+    bumpversion = open(join(dir_path, '.bumpversion.cfg')).read()
+    return re.search("^current_version\s*=\s*(\S*)\s*\n",
+                     bumpversion, re.MULTILINE).group(1)
 
 
 version = get_version(package)

@@ -42,13 +42,13 @@ def list_files(src,
     :param src: source directory
     :type src: str
     :param includes: pattern or list of patterns (*.py, *.txt, etc...)
-    :type includes: str/list
+    :type includes: [str,list]
     :param excludes: pattern or patterns to exclude
-    :type excludes: str/list
+    :type excludes: [str,list]
     :param recursive: list files recursively
     :param in_parents: list files recursively in parents
     :param folders: 0: without folders, 1: with folders, 2: only folders
-    :type folders: [0,1,2]
+    :type folders: enum:[0,1,2]
     :param raise_src_exists: raise exception if src does not exist, or return empty list
     :rtype: path
     """
@@ -213,9 +213,9 @@ def list_files_in_zip(archive,
     :param archive: zipfile to explore
     :type archive: zipfile.ZipFile
     :param includes: pattern or list of patterns ('*.py', '*.txt', etc...)
-    :type includes: str/list
+    :type includes: [str,list]
     :param excludes: patterns to exclude
-    :type excludes: str/list
+    :type excludes: [str,list]
     :param recursive: list files recursively
     :param directories: list also directories (NOT IMPLEMENTED)
     :rtype: list

@@ -20,6 +20,4 @@ apipkg.initpkg(
         'list_files': '.list_files:list_files',
         'list_files_in_zip': '.list_files:list_files_in_zip',
         'PathList': '.pathlist:PathList',
-        'LoadedModules': '.pathlist:LoadedModules',
-        'list_all_dirs_in_modules': '.pathlist:list_all_dirs_in_modules',
     })
