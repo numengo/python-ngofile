@@ -13,9 +13,7 @@ import os.path
 import re
 import shutil
 import sys
-from builtins import range
 from builtins import str
-from pathlib import Path
 
 from future.utils import text_to_native_str
 

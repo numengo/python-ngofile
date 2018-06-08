@@ -55,8 +55,8 @@ def list_files(src,
     logger = logging.getLogger(__name__)
     if type(src) in [list, set, tuple]:
         for s in src:
-            for f in list_files(s, includes, excludes, recursive, in_parents, folders,
-                       raise_src_exists):
+            for f in list_files(s, includes, excludes, recursive, in_parents,
+                                folders, raise_src_exists):
                 yield f
         return
 
@@ -90,8 +90,8 @@ def list_files(src,
         """ we use strings and only create a path object if it s a resut """
         global inclp, exclp
         global d_count
-        lf_count = 0 # local file counter
-        ld_count = 0 # local inner directory counter
+        lf_count = 0  # local file counter
+        ld_count = 0  # local inner directory counter
         for p in includes:
             p2 = p.replace('\\', '/')
             if '/' in p2:
@@ -103,7 +103,8 @@ def list_files(src,
                 if os.path.exists(pa):
                     ld_count += 1
                     _compile_includes(includes2)
-                    for f in list_files_in_dir(pa, includes2, excludes, recursive):
+                    for f in list_files_in_dir(pa, includes2, excludes,
+                                               recursive):
                         lf_count += 1
                         yield f
                     _compile_includes(includes)
@@ -119,7 +120,8 @@ def list_files(src,
                 if os.path.exists(pa):
                     ld_count += 1
                     _compile_excludes(excludes2)
-                    for f in list_files_in_dir(pa, includes, excludes2, recursive):
+                    for f in list_files_in_dir(pa, includes, excludes2,
+                                               recursive):
                         lf_count += 1
                         yield f
                     _compile_excludes(excludes)
@@ -131,7 +133,8 @@ def list_files(src,
             path = os.path.join(srcdir, name)
             is_dir = os.path.isdir(path)
             if os.path.isdir(path) and recursive:
-                for f in list_files_in_dir(path, includes, excludes, recursive):
+                for f in list_files_in_dir(path, includes, excludes,
+                                           recursive):
                     lf_count += 1
                     yield pathlib.Path(f)
             if inclp.match(name.lower()):
@@ -139,7 +142,7 @@ def list_files(src,
                         or (folders == 2 and is_dir)):
                     lf_count += 1
                     yield pathlib.Path(path)
-        
+
         d_count += ld_count
         logger.debug(
             _('found %i files in %s (and %i inner directories)' %
@@ -180,8 +183,8 @@ def list_files(src,
         yield pathlib.Path(f)
 
     logger.info(
-        _('found %i files in %s (and %i inner directories)' %
-          (f_count, src, d_count)))
+        _('found %i files in %s (and %i inner directories)' % (f_count, src,
+                                                               d_count)))
 
     if in_parents:
         srcdir = pathlib.Path(src)
@@ -192,7 +195,7 @@ def list_files(src,
             excludes2 = excludes.union(set([cur.relative_to(cur.parent)]))
             excludes2 = set([text_to_native_str(e) for e in excludes2])
             for f in ist_files_in_dir(
-                str(cur.parent), includes, excludes2, recursive):
+                    str(cur.parent), includes, excludes2, recursive):
                 f_count += 1
                 yield pathlib.Path(f)
             if f_count:
@@ -243,7 +246,7 @@ def list_files_in_zip(archive,
     if not recursive:
         incl = incl.replace('.*\Z(?ms)', r'[^/]*\Z(?ms)')
         incl = incl.replace('.*$', r'[^/]*$')
-        
+
     for n in archive.namelist():
         if re.match(incl, n) and re.search(excl, n) is None:
             yield n

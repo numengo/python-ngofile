@@ -30,9 +30,8 @@ class NotExistingPathException(NgoFileException, IOError):
 
     def __init__(self, message, path=None):
         if path is not None:
-            message = (_('path %(path)s does not exist' % {
-                'path': str(path)
-            }), message)
+            message = (_('path %(path)s does not exist' % {'path': str(path)}),
+                       message)
         super(NotExistingPathException, self).__init__(message)
 
 
@@ -43,9 +42,9 @@ class NotADirectoryException(NgoFileException, ValueError):
 
     def __init__(self, message, path=None):
         if path is not None:
-            message = (_('path %(path)s is not a directory' % {
-                'path': str(path)
-            }), message)
+            message = (_(
+                'path %(path)s is not a directory' % {'path': str(path)}),
+                       message)
         super(NotADirectoryException, self).__init__(message)
 
 

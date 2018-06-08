@@ -4,16 +4,13 @@ functions/class to deal with filepaths
 """
 from __future__ import unicode_literals
 
-import inspect
 import logging
 import operator
 import os.path
 import pathlib
 import pprint
 import importlib
-import sys
 from builtins import object
-from builtins import str
 
 from future.utils import text_to_native_str
 
@@ -58,8 +55,8 @@ class PathList(object):
         '''
         Return representation of the object
         '''
-        return ("<%s[%i items]>" % (self.__class__.__name__,
-                                    len(self._pathdict)))
+        return (
+            "<%s[%i items]>" % (self.__class__.__name__, len(self._pathdict)))
 
     @property
     def pathlist(self):
@@ -185,4 +182,3 @@ class PathList(object):
                     yield f
             else:
                 yield list(lf)
- 

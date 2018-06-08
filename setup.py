@@ -2,15 +2,19 @@
 from __future__ import absolute_import
 from __future__ import print_function
 
+from setuptools import find_packages
+from setuptools import setup
+from setuptools.command.install import install
+
 import io
-import os.path
+import os
 import re
 import sys
 import subprocess
+from os.path import basename
+from os.path import dirname
+from os.path import join
 from glob import glob
-
-from setuptools import find_packages
-from setuptools import setup
 
 name = 'ngofile'
 package = 'ngofile'
@@ -79,9 +83,20 @@ install_requires=[
     'boto',  
 ]
 
-cmd = ['pip','install', '-q'] + [i for i in install_requires if '-' in i]
-subprocess.check_call(cmd)
-install_requires = [i for i in install_requires if not '-' in i]
+post_install_requires = [i for i in install_requires if ('-' in i or ':' in i)]
+install_requires = [i for i in install_requires if not ('-' in i or ':' in i)]
+
+
+# for setuptools to work properly, we need to install packages with - or : separately
+# and for that we need a hook
+# https://stackoverflow.com/questions/20288711/post-install-script-with-python-setuptools
+class PostInstallCommand(install):
+    """Post-installation for installation mode."""
+    def run(self):
+        if post_install_requires:
+            cmd = ['pip', 'install', '-q'] + post_install_requires
+            subprocess.check_call(cmd)
+        install.run(self)
 
 test_requires=[
     'pytest',
@@ -140,6 +155,10 @@ setup(
         'Programming Language :: Python :: Implementation :: CPython',
         'Topic :: Utilities',
     ],
+    cmdclass={
+        'install': PostInstallCommand,
+        'develop': PostInstallCommand,
+    },
 )
 
 if sys.argv[-1] == 'publish':

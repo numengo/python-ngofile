@@ -1,7 +1,5 @@
 from __future__ import unicode_literals
 
-from click.testing import CliRunner
-
 #from ngofile.cli import main
 
 #def test_main():
