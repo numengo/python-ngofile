@@ -21,31 +21,15 @@ class PathList(object):
     """
     Pathlist manager
     """
-    _initialized = False
-    _instance = None
-
-    def __new__(cls, *args, **kwargs):
-        singleton = kwargs.get('singleton', True)
-        if singleton:
-            if not cls._instance:
-                cls._instance = super(PathList, cls).__new__(cls)
-                cls._instance._pathdict = {}
-            return cls._instance
-        else:
-            cls._pathdict = {}
-            return super(PathList, cls).__new__(cls)
-
+    logger = logging.getLogger(__name__)
+    
     def __init__(self, *args, **kwargs):
         """
         Appends each arg as a path of pathlist
-        if `pathlist` is given as keyword argument used as pathlist.
         """
-        self.logger = logging.getLogger(__name__)
+        self._pathdict = {}
         for arg in args:
-            if arg:
-                self.add(arg)
-        if 'pathlist' in kwargs:
-            self.pathlist = kwargs.pop('pathlist')
+            self.add(arg)
 
     def __str__(self):
         return ("<%s>\n%s" % (self.__class__.__name__,
