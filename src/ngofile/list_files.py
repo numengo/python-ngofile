@@ -148,7 +148,7 @@ def list_files(src,
             _('found %i files in %s (and %i inner directories)' %
               (lf_count, srcdir, ld_count)))
 
-    src = text_to_native_str(src)
+    src = text_to_native_str(str(src))
     # treat case src is given as a pattern and does not really exist,
     # convert it to an include
     if '*' in src:
@@ -193,9 +193,9 @@ def list_files(src,
             f_count = 0
             d_count = 0
             excludes2 = excludes.union(set([cur.relative_to(cur.parent)]))
-            excludes2 = set([text_to_native_str(e) for e in excludes2])
-            for f in ist_files_in_dir(
-                    str(cur.parent), includes, excludes2, recursive):
+            excludes2 = set([text_to_native_str(str(e)) for e in excludes2])
+            for f in list_files_in_dir(
+                    text_to_native_str(str(cur.parent)), includes, excludes2, recursive):
                 f_count += 1
                 yield pathlib.Path(f)
             if f_count:

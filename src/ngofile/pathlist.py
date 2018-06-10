@@ -10,6 +10,7 @@ import os.path
 import pathlib
 import pprint
 import importlib
+from builtins import str
 from builtins import object
 
 from future.utils import text_to_native_str
@@ -63,7 +64,7 @@ class PathList(object):
 
         :rtype: list, items:{type:str}
         """
-        return [text_to_native_str(p) for p in self.pathlist]
+        return [text_to_native_str(str(p)) for p in self.pathlist]
 
     def add(self, path):
         """
@@ -74,7 +75,7 @@ class PathList(object):
         """
         if type(path) in [list, set, tuple]:
             return [self.exists(p) for p in path]
-        p = text_to_native_str(path)
+        p = text_to_native_str(str(path))
         if '*' in p:
             # use list_files to create a list of files corresponding to pattern
             # and add the list pathlist
@@ -95,7 +96,7 @@ class PathList(object):
         :type module: string
         """
         m = importlib.import_module(module)
-        self.add(pathlib.Path(m.__file__).dirname.joinpath(args))
+        self.add(pathlib.Path(m.__file__).parent.joinpath(args))
 
     def exists(self, path):
         """
@@ -119,7 +120,7 @@ class PathList(object):
         """
         if type(path) in [list, set, tuple]:
             return [self.pick_first(p) for p in path]
-        path = text_to_native_str(path)
+        path = text_to_native_str(str(path))
         path = path.replace('\\', '/')
         includes = []
         if '*' in path:
