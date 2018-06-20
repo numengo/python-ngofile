@@ -195,7 +195,8 @@ def list_files(src,
             excludes2 = excludes.union(set([cur.relative_to(cur.parent)]))
             excludes2 = set([text_to_native_str(str(e)) for e in excludes2])
             for f in list_files_in_dir(
-                    text_to_native_str(str(cur.parent)), includes, excludes2, recursive):
+                    text_to_native_str(str(cur.parent)), includes, excludes2,
+                    recursive):
                 f_count += 1
                 yield pathlib.Path(f)
             if f_count:

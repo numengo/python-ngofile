@@ -23,7 +23,7 @@ class PathList(object):
     Pathlist manager
     """
     logger = logging.getLogger(__name__)
-    
+
     def __init__(self, *args, **kwargs):
         """
         Appends each arg as a path of pathlist
