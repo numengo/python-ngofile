@@ -13,7 +13,7 @@ from builtins import object
 from builtins import str
 from pathlib import Path
 
-import ngofile
+from ngofile.pathlist import PathList
 
 test_file = Path(__file__).resolve()
 test_dir = Path(__file__).resolve().parent
@@ -23,14 +23,14 @@ class TestPathList(object):
     logger = logging.getLogger(__name__)
 
     def test_singleton(self):
-        a = ngofile.PathList(test_dir)
-        b = ngofile.PathList()
+        a = PathList(test_dir)
+        b = PathList()
         b.add(str(
             test_dir))  # test_dir is already added during initialisation of a
         assert len(a.pathlist) == 1
 
     def test_exists(self):
-        a = ngofile.PathList(test_dir)
+        a = PathList(test_dir)
         p2 = a.pick_first(test_file.name)
         assert p2.exists()
         assert not a.exists('dummy.dum')
