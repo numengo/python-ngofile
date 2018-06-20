@@ -70,6 +70,7 @@ htmlcov
 *.komodoproject
 *.pyproj
 *.sln
+.vscode
 
 # Complexity
 output/*.html
