@@ -32,8 +32,7 @@ def list_files(src,
                excludes=[],
                recursive=False,
                in_parents=False,
-               folders=1,
-               raise_src_exists=True):
+               folders=0):
     """
     List files in a source path with a list of given patterns
 
@@ -49,14 +48,13 @@ def list_files(src,
     :param in_parents: list files recursively in parents
     :param folders: 0: without folders, 1: with folders, 2: only folders
     :type folders: enum:[0,1,2]
-    :param raise_src_exists: raise exception if src does not exist, or return empty list
     :rtype: path
     """
     logger = logging.getLogger(__name__)
     if type(src) in [list, set, tuple]:
         for s in src:
             for f in list_files(s, includes, excludes, recursive, in_parents,
-                                folders, raise_src_exists):
+                                folders):
                 yield f
         return
 
@@ -158,11 +156,9 @@ def list_files(src,
         inc = '%s*%s' % (inc, af)
         includes.add(inc)
     if not os.path.exists(src):
-        if raise_src_exists:
-            raise IOError(
-                _('impossible to list file in non existing directory %s' %
-                  src))
-        return
+        raise IOError(
+            _('impossible to list file in non existing directory %s' %
+              src))
     if not os.path.isdir(src):  # it s a file, returns it
         yield pathlib.Path(src)
         return

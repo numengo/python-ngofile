@@ -31,14 +31,10 @@ def main(names):
 @click.option('--in_parents', help=_('list files recursively in parents'))
 @click.option(
     '--folders',
-    default=1,
+    default=0,
     help=_('0: without folders, 1: with folders, 2: only folders'))
-@click.option(
-    '--raise_src_exists',
-    default=True,
-    help=_('raise exception if src does not exist, or return empty list'))
 def list_files_cli(ctx, src, includes, excludes, recursive, in_parents,
-                   folders, raise_src_exists):
+                   folders):
     """ list files in a source path with a list of given patterns 
     if src contains patterns, modifies initial source dir and create corresponding includes patterns"""
     list_files()
