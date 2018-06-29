@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-""" Unit tests for _list_files
-
-setup.py - created on 2017/11/15 08:44:32
+""" 
 author: Cedric ROMAN
 email: roman@numengo.com
-licence: GNU GPLv3 """
+licence: GNU GPLv3 
+"""
 from __future__ import unicode_literals
 
 import zipfile

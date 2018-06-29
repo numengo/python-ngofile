@@ -75,6 +75,7 @@ setup_requires=[
 install_requires=[
     'future',
     'python-gettext',
+    'dateutil',
     'click',
     'pathlib',
     'boto',  
