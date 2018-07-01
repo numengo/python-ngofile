@@ -122,11 +122,15 @@ class PathList(object):
             return [self.pick_first(p) for p in path]
         path = text_to_native_str(str(path))
         path = path.replace('\\', '/')
+        recursive = False
         includes = []
         if '*' in path:
             bf, af = path.split('*', 1)
             path, inc = bf.rsplit('/', 1)
-            includes = ['%s*%s' % (inc, af)]
+            includes = '%s*%s' % (inc, af)
+            if '**/' in includes:
+                recursive = True
+                includes = includes.split('**/')[1]
         if os.path.exists(path):
             return pathlib.Path(path)
         optimized_pathlist = sorted(
@@ -135,7 +139,7 @@ class PathList(object):
             reverse=True)
         for p, _oldc in optimized_pathlist:
             if p.joinpath(path).exists():
-                return next(list_files(p.joinpath(path), includes))
+                return next(list_files(p.joinpath(path), includes, recursive=recursive))
 
     def list_files(self,
                    includes=["*"],
