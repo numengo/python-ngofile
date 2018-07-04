@@ -1,10 +1,11 @@
 # *- coding: utf-8 -*-
 """click API for NgoFile"""
-import click
 import gettext
 
-from ngofile.list_files import list_files
+import click
+
 from ngofile.copy import advanced_copy
+from ngofile.list_files import list_files
 
 _ = gettext.gettext
 

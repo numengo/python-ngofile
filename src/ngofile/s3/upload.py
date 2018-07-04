@@ -3,19 +3,19 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import logging
-import os
-import sys
 import optparse
+import os
+import ssl
+import sys
 import time
 
-from boto.s3.connection import S3Connection
 from boto.exception import S3ResponseError
+from boto.s3.connection import S3Connection
 from boto.s3.key import Key
 
-from . import utils
 from . import progress_bar
+from . import utils
 
-import ssl
 if hasattr(ssl, '_create_unverified_context'):
    ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -62,7 +62,7 @@ def upload_file(filename, bucket, prefix=None, reduced_redundancy=False):
 
     size = os.stat(filename_l).st_size
     if size == 0:
-        logger.info('Bad filesize for "%s"' % (filename))
+        logger.info('Bad filesize for "%s"', filename)
         return 0
 
     widgets = [
@@ -126,4 +126,5 @@ if __name__ == '__main__':
         count += 1
 
     if len(args) > 2:
-        logger.info('%s files %s at %.2f kb/s' % (count, sizeof_fmt(total_bytes), (total_bytes / 1024)/time.time() - stime))
+        logger.info('%s files %s at %.2f kb/s', count, sizeof_fmt(total_bytes), 
+                    (total_bytes / 1024)/time.time() - stime)
