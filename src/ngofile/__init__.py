@@ -1,6 +1,20 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-__author__ = """Cédric ROMAN"""
+import sys
+from builtins import str
+
+from past.builtins import basestring
+
+enc = sys.stdout.encoding or "cp850"
+
+
+def get_unicode(str_or_unicode, encoding=enc):
+    if isinstance(str_or_unicode, (str, basestring)):
+        return str_or_unicode
+    return str(str_or_unicode, encoding, errors='ignore')
+
+
+__author__ = 'Cédric ROMAN'
 __email__ = 'roman@numengo.com'
 __version__ = '0.2.0'

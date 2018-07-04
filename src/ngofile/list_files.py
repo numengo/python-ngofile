@@ -8,7 +8,6 @@ licence: GNU GPLv3
 from __future__ import unicode_literals
 
 import fnmatch
-import gettext
 import logging
 import os
 import os.path
@@ -23,8 +22,6 @@ from future.utils import text_to_native_str
 from .exceptions import NotADirectoryException
 from .exceptions import NotAZipArchiveException
 from .exceptions import NotExistingPathException
-
-_ = gettext.gettext
 
 
 def list_files(src,
@@ -142,9 +139,8 @@ def list_files(src,
                     yield pathlib.Path(path)
 
         d_count += ld_count
-        logger.debug(
-            _('found %i files in %s (and %i inner directories)' %
-              (lf_count, srcdir, ld_count)))
+        logger.debug('found %i files in %s (and %i inner directories)',
+                     lf_count, srcdir, ld_count)
 
     src = text_to_native_str(str(src))
     # treat case src is given as a pattern and does not really exist,
@@ -156,9 +152,8 @@ def list_files(src,
         inc = '%s*%s' % (inc, af)
         includes.add(inc)
     if not os.path.exists(src):
-        raise IOError(
-            _('impossible to list file in non existing directory %s' %
-              src))
+        raise IOError('impossible to list file in non existing directory %s',
+                      src)
     if not os.path.isdir(src):  # it s a file, returns it
         yield pathlib.Path(src)
         return
@@ -178,9 +173,8 @@ def list_files(src,
         f_count += 1
         yield pathlib.Path(f)
 
-    logger.info(
-        _('found %i files in %s (and %i inner directories)' % (f_count, src,
-                                                               d_count)))
+    logger.info('found %i files in %s (and %i inner directories)', f_count,
+                src, d_count)
 
     if in_parents:
         srcdir = pathlib.Path(src)
@@ -197,8 +191,8 @@ def list_files(src,
                 yield pathlib.Path(f)
             if f_count:
                 logger.info(
-                    _('found %i files in parents in %s (and %i inner directories)'
-                      % (f_count, cur.parent, d_count)))
+                    'found %i files in parents in %s (and %i inner directories)',
+                    f_count, cur.parent, d_count)
             cur = cur.parent
 
 

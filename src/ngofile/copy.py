@@ -6,7 +6,6 @@ from __future__ import unicode_literals
 
 import filecmp
 import fnmatch
-import gettext
 import logging
 import os
 import os.path
@@ -14,16 +13,17 @@ import re
 import shutil
 import sys
 from builtins import str
+from pathlib import Path
 
 from future.utils import text_to_native_str
 
+from . import get_unicode
 from .exceptions import CopyException
 from .exceptions import NgoFileException
 from .exceptions import NotADirectoryException
 from .exceptions import NotExistingPathException
 
 enc = sys.stdout.encoding or "cp850"
-_ = gettext.gettext
 
 
 def _copy(src, dst):
@@ -44,13 +44,13 @@ def _copy(src, dst):
         dst = os.path.join(dst, os.path.basename(src))
     if os.path.exists(dst):
         if not filecmp.cmp(src, dst):
-            logger.debug('updating ' + str(dst, enc))
+            logger.debug('updating %s', get_unicode(dst, enc))
             shutil.copy2(src, dst)
         else:
-            pass
-            # logger.info(unicode(dst,enc) + ' already up to date')
+            logger.debug('%s already up to date', get_unicode(dst, enc))
     else:
-        logger.debug('copy ' + str(src, enc) + ' to ' + str(dst, enc))
+        logger.debug('copy %s to %s', get_unicode(src, enc),
+                     get_unicode(dst, enc))
         shutil.copy2(src, dst)
 
 
@@ -83,7 +83,7 @@ def _copytree(src, dst, excludes=[], includes=[], recursive=True):
     errors = []
 
     if not os.path.exists(dst):
-        logger.debug('making dir' + str(dst, enc))
+        logger.debug('making dir %s', get_unicode(dst, enc))
         os.makedirs(dst)
 
     for name in names:
@@ -131,14 +131,14 @@ def advanced_copy(src,
     :param create_directory: create missing directories
     """
     logger = logging.getLogger(__name__)
-
     src = text_to_native_str(src)  # not Path because it could have a pattern
-    dsts = validators.TypedSet(validators.Path)(
-        dst
-    )  # not is dir because it might not exist if it s just being created
-    includes = validators.TypedSet(text_to_native_str)(includes)
-    excludes = validators.TypedSet(text_to_native_str)(excludes)
-
+    dsts = dst if isinstance(dst, list) else [dsts]
+    dsts = [Path(text_to_native_str(f)) for f in dsts]
+    # not is dir because it might not exist if it s just being created
+    includes = includes if isinstance(includes, list) else [includes]
+    excludes = excludes if isinstance(excludes, list) else [excludes]
+    includes = set([text_to_native_str(i) for i in includes])
+    excludes = set([text_to_native_str(e) for e in excludes])
     # treat case src is given as a pattern and does not really exist,
     # convert it to an include
     if '*' in src:
@@ -147,24 +147,28 @@ def advanced_copy(src,
         src, inc = bf.rsplit('/', 1)
         inc = '%s*%s' % (inc, af)
         includes.add(inc)
-    src = validators.ExistingPath(src)
+
+    src = Path(src)
+    assert src.exists()
 
     for dst in dsts:
         # do we need to create dst directories ?
         parts = dst.parts
-        cur = validators.Path(parts[0])
-        assert cur.exists(), '%s does not exist' % str(cur)
+        cur = Path(parts[0])
+        assert cur.exists(), '%s does not exist' % get_unicode(cur)
         for p in parts[1:]:
             cur = cur.joinpath(p)
             if not cur.is_dir():
                 if not create_directory:
                     raise NotADirectoryException(
-                        _('Use create_directory option.'), cur)
-                logger.debug(_('creating directory %s' % cur))
+                        'Use create_directory option.', cur)
+                logger.debug('creating directory %s', cur)
                 os.makedirs(text_to_native_str(cur.resolve()))
         if src.is_file():
-            logger.debug('_copy(%s,%s)' % (str(src), str(dst)))
+            logger.debug('_copy(%s,%s)', get_unicode(src, enc),
+                         get_unicode(dst, enc))
             _copy(src, dst)
         else:
-            logger.debug('_copytree(%s,%s,...)' % (str(src), str(dst)))
+            logger.debug('_copytree(%s,%s,...)', get_unicode(src, enc),
+                         get_unicode(dst, enc))
             _copytree(src, dst, excludes, includes, recursive)

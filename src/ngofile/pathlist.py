@@ -4,14 +4,14 @@ functions/class to deal with filepaths
 """
 from __future__ import unicode_literals
 
+import importlib
 import logging
 import operator
 import os.path
 import pathlib
 import pprint
-import importlib
-from builtins import str
 from builtins import object
+from builtins import str
 
 from future.utils import text_to_native_str
 
@@ -86,7 +86,7 @@ class PathList(object):
                 p = p.resolve()
                 self._pathdict[p] = 0  # intialize counter
             else:
-                self.logger.warning('%s does not exist' % p)
+                self.logger.warning('%s does not exist', p)
 
     def add_module_path(self, module, *args):
         """
@@ -139,7 +139,9 @@ class PathList(object):
             reverse=True)
         for p, _oldc in optimized_pathlist:
             if p.joinpath(path).exists():
-                return next(list_files(p.joinpath(path), includes, recursive=recursive))
+                return next(
+                    list_files(
+                        p.joinpath(path), includes, recursive=recursive))
 
     def list_files(self,
                    includes=["*"],

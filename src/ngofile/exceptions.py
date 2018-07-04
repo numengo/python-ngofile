@@ -2,12 +2,9 @@
 """
 All exceptions used in the ngofile code base are defined here.
 """
+
 from __future__ import unicode_literals
-
-import gettext
 from builtins import str
-
-_ = gettext.gettext
 
 
 class NgoFileException(Exception):
@@ -30,8 +27,7 @@ class NotExistingPathException(NgoFileException, IOError):
 
     def __init__(self, message, path=None):
         if path is not None:
-            message = (_('path %(path)s does not exist' % {'path': str(path)}),
-                       message)
+            message = 'path %s does not exist.\n%s' % (str(path), message)
         super(NotExistingPathException, self).__init__(message)
 
 
@@ -42,9 +38,7 @@ class NotADirectoryException(NgoFileException, ValueError):
 
     def __init__(self, message, path=None):
         if path is not None:
-            message = (_(
-                'path %(path)s is not a directory' % {'path': str(path)}),
-                       message)
+            message = 'path %s is not a directory.\n%s' % (str(path), message)
         super(NotADirectoryException, self).__init__(message)
 
 
