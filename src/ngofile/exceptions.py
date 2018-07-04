@@ -2,8 +2,8 @@
 """
 All exceptions used in the ngofile code base are defined here.
 """
-
 from __future__ import unicode_literals
+
 from builtins import str
 
 
