@@ -61,8 +61,8 @@ def list_files(src,
 
     def _compile_includes(includes):
         global inclp
-        incl = r'|'.join([fnmatch.translate(x.lower()) for x in includes])
-        inclp = re.compile(incl)
+        incl = r'|'.join([fnmatch.translate(x) for x in includes])
+        inclp = re.compile(incl, re.IGNORECASE)
 
     # declare excludes regex and create a function to compile it
     global exclp
@@ -70,9 +70,9 @@ def list_files(src,
 
     def _compile_excludes(excludes):
         global exclp
-        excl = r'|'.join([fnmatch.translate(x.lower())
+        excl = r'|'.join([fnmatch.translate(x)
                           for x in excludes]) or r'$.'
-        exclp = re.compile(excl)
+        exclp = re.compile(excl, re.IGNORECASE)
 
     # global counters
     global f_count
@@ -122,7 +122,7 @@ def list_files(src,
                     _compile_excludes(excludes)
         names_all = os.listdir(srcdir)
         names_not_excl = [
-            name for name in names_all if not exclp.match(name.lower())
+            name for name in names_all if not exclp.match(name)
         ]
         for name in names_not_excl:
             path = os.path.join(srcdir, name)
@@ -132,7 +132,7 @@ def list_files(src,
                                            recursive):
                     lf_count += 1
                     yield pathlib.Path(f)
-            if inclp.match(name.lower()):
+            if inclp.match(name):
                 if ((folders == 0 and not is_dir) or (folders == 1)
                         or (folders == 2 and is_dir)):
                     lf_count += 1
