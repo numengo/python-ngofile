@@ -71,8 +71,8 @@ def _copytree(src, dst, excludes=[], includes=[], recursive=True):
     logger = logging.getLogger(__name__)
     # make sure to convert string from ngopath
     # convert everything to ngopath and back to string
-    src = text_to_native_str(src)
-    dst = text_to_native_str(dst)
+    src = text_to_native_str(str(src))
+    dst = text_to_native_str(str(dst))
 
     incl = r'|'.join([fnmatch.translate(x) for x in includes])
     excl = r'|'.join([fnmatch.translate(x) for x in excludes]) or r'$.'
@@ -120,7 +120,7 @@ def advanced_copy(src,
     Copy a directory structure src to destination
     
     :param src: source file or directory
-    :type src: path
+    :type src: string
     :param dst: destination file or directory
     :type dst: path
     :param excludes: list of patterns to exclude
@@ -131,8 +131,7 @@ def advanced_copy(src,
     :param create_directory: create missing directories
     """
     logger = logging.getLogger(__name__)
-    src = text_to_native_str(src)  # not Path because it could have a pattern
-    dsts = dst if isinstance(dst, list) else [dsts]
+    dsts = dst if isinstance(dst, list) else [dst]
     dsts = [Path(text_to_native_str(f)) for f in dsts]
     # not is dir because it might not exist if it s just being created
     includes = includes if isinstance(includes, list) else [includes]
@@ -141,6 +140,7 @@ def advanced_copy(src,
     excludes = set([text_to_native_str(e) for e in excludes])
     # treat case src is given as a pattern and does not really exist,
     # convert it to an include
+    src = text_to_native_str(str(src))
     if '*' in src:
         src = src.replace('\\', '/')
         bf, af = src.split('*', 1)
@@ -163,12 +163,12 @@ def advanced_copy(src,
                     raise NotADirectoryException(
                         'Use create_directory option.', cur)
                 logger.debug('creating directory %s', cur)
-                os.makedirs(text_to_native_str(cur.resolve()))
+                os.makedirs(text_to_native_str(str(cur.resolve())))
         if src.is_file():
-            logger.debug('_copy(%s,%s)', get_unicode(src, enc),
-                         get_unicode(dst, enc))
+            logger.debug('_copy(%s,%s)', get_unicode(str(src), enc),
+                         get_unicode(str(dst), enc))
             _copy(src, dst)
         else:
-            logger.debug('_copytree(%s,%s,...)', get_unicode(src, enc),
-                         get_unicode(dst, enc))
+            logger.debug('_copytree(%s,%s,...)', get_unicode(str(src), enc),
+                         get_unicode(str(dst), enc))
             _copytree(src, dst, excludes, includes, recursive)
