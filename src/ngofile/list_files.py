@@ -24,7 +24,7 @@ from .exceptions import NotAZipArchiveException
 from .exceptions import NotExistingPathException
 
 
-def list_files(src,
+def yield_files(src,
                includes=["*"],
                excludes=[],
                recursive=False,
@@ -195,8 +195,16 @@ def list_files(src,
                     f_count, cur.parent, d_count)
             cur = cur.parent
 
+def list_files(src,
+               includes=["*"],
+               excludes=[],
+               recursive=False,
+               in_parents=False,
+               folders=0):
+    __doc__ = yield_files.__doc__
+    return list(yield_files(src, includes, excludes, recursive, in_parents, folders))
 
-def list_files_in_zip(archive,
+def yield_files_in_zip(archive,
                       includes=["*"],
                       excludes=[],
                       recursive=False,
@@ -241,3 +249,11 @@ def list_files_in_zip(archive,
     for n in archive.namelist():
         if re.match(incl, n) and re.search(excl, n) is None:
             yield n
+
+def list_files_in_zip(archive,
+                      includes=["*"],
+                      excludes=[],
+                      recursive=False,
+                      directories=True):
+    __doc__ = yield_files_in_zip.__doc__
+    return list(yield_files_in_zip(archive, includes, excludes, recursive, directories))

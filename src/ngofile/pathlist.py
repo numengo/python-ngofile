@@ -16,6 +16,7 @@ from builtins import str
 from future.utils import text_to_native_str
 
 from .list_files import list_files
+from .list_files import yield_files
 
 
 class PathList(object):
@@ -79,7 +80,7 @@ class PathList(object):
         if '*' in p:
             # use list_files to create a list of files corresponding to pattern
             # and add the list pathlist
-            self.add(list(list_files(p)))
+            self.add(list_files(p))
         p = pathlib.Path(path)
         if p not in self.pathlist:
             if p.exists():
@@ -140,10 +141,10 @@ class PathList(object):
         for p, _oldc in optimized_pathlist:
             if p.joinpath(path).exists():
                 return next(
-                    list_files(
-                        p.joinpath(path), includes, recursive=recursive))
+                    yield_files(
+                        p.joinpath(path), includes, recursive=recursive), None)
 
-    def list_files(self,
+    def yield_files(self,
                    includes=["*"],
                    excludes=[],
                    recursive=False,
@@ -167,9 +168,17 @@ class PathList(object):
             key=operator.itemgetter(1),
             reverse=True)
         for p, _oldc in optimized_pathlist:
-            lf = list_files(p, includes, excludes, recursive, in_parents)
+            lf = yield_files(p, includes, excludes, recursive, in_parents)
             if flatten:
                 for f in lf:
                     yield f
             else:
                 yield list(lf)
+
+    def list_files(self,
+                   includes=["*"],
+                   excludes=[],
+                   recursive=False,
+                   in_parents=False,
+                   flatten=True):
+        return list(self.yield_files(includes, excludes, recursive, in_parents, flatten))
