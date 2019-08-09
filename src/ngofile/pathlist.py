@@ -125,7 +125,10 @@ class PathList(object):
         path = path.replace('\\', '/')
         recursive = False
         includes = []
-        if '*' in path:
+        if '**/' in path:
+            path, includes = path.split('**/', 1)
+            recursive = True
+        elif '*' in path:
             bf, af = path.split('*', 1)
             path, inc = bf.rsplit('/', 1)
             includes = '%s*%s' % (inc, af)
