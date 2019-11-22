@@ -45,7 +45,7 @@ default_context:
     linter:                    'flake8'
     package_name:              'ngofile'
     project_name:              'NgoFile'
-    project_short_description: 'misc file utilities'
+    short_description: 'misc file utilities'
     python2:                   'True'
     python3:                   'True'
     python_envs:               'py27, py34'
