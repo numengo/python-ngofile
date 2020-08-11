@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-""" 
+"""
 utilities to list files in a directory, or a zip file
 
 author: Cedric ROMAN (roman@numengo.com)
@@ -23,6 +23,9 @@ from .exceptions import NotADirectoryException
 from .exceptions import NotAZipArchiveException
 from .exceptions import NotExistingPathException
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.WARNING)
+
 
 def yield_files(src,
                includes=["*"],
@@ -34,7 +37,7 @@ def yield_files(src,
     List files in a source path with a list of given patterns
 
     if src contains patterns, modifies initial source dir and create corresponding includes patterns
-    
+
     :param src: source directory
     :type src: str
     :param includes: pattern or list of patterns (*.py, *.txt, etc...)
@@ -47,7 +50,6 @@ def yield_files(src,
     :type folders: enum:[0,1,2]
     :rtype: path
     """
-    logger = logging.getLogger(__name__)
     if type(src) in [list, set, tuple]:
         for s in src:
             for f in list_files(s, includes, excludes, recursive, in_parents,
@@ -195,6 +197,7 @@ def yield_files(src,
                     f_count, cur.parent, d_count)
             cur = cur.parent
 
+
 def list_files(src,
                includes=["*"],
                excludes=[],
@@ -203,6 +206,7 @@ def list_files(src,
                folders=0):
     __doc__ = yield_files.__doc__
     return list(yield_files(src, includes, excludes, recursive, in_parents, folders))
+
 
 def yield_files_in_zip(archive,
                       includes=["*"],
@@ -249,6 +253,7 @@ def yield_files_in_zip(archive,
     for n in archive.namelist():
         if re.match(incl, n) and re.search(excl, n) is None:
             yield n
+
 
 def list_files_in_zip(archive,
                       includes=["*"],

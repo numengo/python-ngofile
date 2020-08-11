@@ -23,7 +23,7 @@ class PathList(object):
     """
     Pathlist manager
     """
-    logger = logging.getLogger(__name__)
+    _logger = logging.getLogger(__name__)
 
     def __init__(self, *args, **kwargs):
         """
@@ -87,7 +87,7 @@ class PathList(object):
                 p = p.resolve()
                 self._pathdict[p] = 0  # intialize counter
             else:
-                self.logger.warning('%s does not exist', p)
+                self._logger.warning('%s does not exist', p)
 
     def add_module_path(self, module, *args):
         """
@@ -154,8 +154,8 @@ class PathList(object):
                    in_parents=False,
                    flatten=True):
         """
-        List files in a source directory with a list of given patterns 
-        
+        List files in a source directory with a list of given patterns
+
         :param includes: pattern or list of patterns ('*.py', '*.txt', etc...)
         :type includes: [str,list]
         :param excludes: patterns to exclude

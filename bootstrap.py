@@ -42,7 +42,7 @@ if __name__ == "__main__":
         lstrip_blocks=True,
         keep_trailing_newline=True
     )
-    
+
 
     toxEnvironments = {}
     for (alias, conf) in matrix.from_file(join(base_path, "setup.cfg")).items():
@@ -56,8 +56,8 @@ if __name__ == "__main__":
             cover = {"false": False, "true": True}[conf["coverage_flags"].lower()]
             toxEnvironments[alias].update(cover=cover)
         if "environment_variables" in conf:
-            envVars = conf["environment_variables"]
-            toxEnvironments[alias].update(envVars=envVars.split())
+            env_vars = conf["environment_variables"]
+            toxEnvironments[alias].update(env_vars=env_vars.split())
 
     for name in os.listdir(join(".templates")):
         if not name.startswith("template"):
