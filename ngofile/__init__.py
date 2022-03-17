@@ -17,4 +17,4 @@ def get_unicode(str_or_unicode, encoding=enc):
 
 __author__ = 'Cédric ROMAN'
 __email__ = 'roman@numengo.com'
-__version__ = '0.2.0'
+__version__ = '1.0.0'

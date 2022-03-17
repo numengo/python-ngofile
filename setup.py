@@ -81,21 +81,6 @@ install_requires=[
     'boto',
 ]
 
-post_install_requires = [i for i in install_requires if ('-' in i or ':' in i)]
-install_requires = [i for i in install_requires if not ('-' in i or ':' in i)]
-
-
-# for setuptools to work properly, we need to install packages with - or : separately
-# and for that we need a hook
-# https://stackoverflow.com/questions/20288711/post-install-script-with-python-setuptools
-class PostInstallCommand(install):
-    """Post-installation for installation mode."""
-    def run(self):
-        if post_install_requires:
-            cmd = ['pip', 'install', '-q'] + post_install_requires
-            subprocess.check_call(cmd)
-        install.run(self)
-
 test_requires=[
     'pytest',
     'pytest-logger',
@@ -109,14 +94,15 @@ setup(
     version=version,
     license=license,
     description=description,
-    long_description='%s\n%s' % (
-        re.compile('^.. start-badges.*^.. end-badges', re.M | re.S).sub('', read('README.rst')),
-        re.sub(':[a-z]+:`~?(.*?)`', r'``\1``', read('CHANGELOG.rst'))
-    ),
+    long_description='%s\n%s' %
+    (re.compile('^.. skip-next.*', re.M | re.S).sub('',
+     re.compile('^.. start-badges.*^.. end-badges', re.M | re.S).sub('',
+     read('README.rst'))),
+     re.sub(':[a-z]+:`~?(.*?)`', r'``\1``', read('CHANGELOG.rst'))),
     author=author,
     author_email=author_email,
     url=url,
-    packages=[package],
+    packages=find_packages(exclude='tests'),
     package_data=get_package_data(package),
     include_package_data=True,
     zip_safe=False,
@@ -124,7 +110,6 @@ setup(
     # python_requires=">=2.7,!=2.7.*,!=3.4.*,!=3.5.*,!=3.6.*,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,",
     setup_requires=setup_requires,
     install_requires=install_requires,
-    requires = install_requires,
     tests_require=test_requires,
     extras_require=extras_requires,
     entry_points={
@@ -145,16 +130,16 @@ setup(
         'Operating System :: Microsoft :: Windows',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: Implementation :: CPython',
         'Topic :: Utilities',
     ],
-    cmdclass={
-        'install': PostInstallCommand,
-        #'develop': PostInstallCommand,
-    },
 )
 
 if sys.argv[-1] == 'publish':
