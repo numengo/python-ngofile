@@ -32,9 +32,9 @@ Overview
     :alt: PyPI Package latest release
     :target: https://pypi.python.org/pypi/ngofile
 
-.. |commits-since| image:: https://img.shields.io/github/commits-since/numengo/python-ngofile/v1.0.0.svg
+.. |commits-since| image:: https://img.shields.io/github/commits-since/numengo/python-ngofile/v1.0.1.svg
     :alt: Commits since latest release
-    :target: https://github.com/numengo/python-ngofile/compare/v1.0.0...master
+    :target: https://github.com/numengo/python-ngofile/compare/v1.0.1...master
 
 .. |wheel| image:: https://img.shields.io/pypi/wheel/ngofile.svg
     :alt: PyPI Wheel
