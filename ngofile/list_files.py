@@ -108,6 +108,9 @@ def yield_files(src,
 
         for p in excludes:
             p2 = p.replace('\\', '/')
+            # deal with absolute path
+            if p2.startswith(srcdir):
+                p2 = str(pathlib.Path(p2).relative_to(srcdir))
             if '/' in p2:
                 excludes2 = set(excludes)
                 pa, pb = p2.split('/', 1)
